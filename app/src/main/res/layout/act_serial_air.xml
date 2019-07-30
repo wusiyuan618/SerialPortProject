@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="返回上一级"/>
+        <LinearLayout
+            android:id="@+id/ll_send"
+            android:layout_below="@id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="发送指令:" />
+
+            <EditText
+                android:id="@+id/ed_send"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:text="01030000000AC5CD"
+                android:textSize="18dp" />
+
+            <Button
+                android:id="@+id/btn_send"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="发送命令" />
+        </LinearLayout>
+        <Button
+            android:layout_below="@id/ll_send"
+            android:id="@+id/btn_searchEnv"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="查询环境数据"/>
+        <LinearLayout
+            android:id="@+id/ll_jdqControl"
+            android:layout_below="@id/btn_searchEnv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="输入控制码（16进制，例如3f）：" />
+            <EditText
+                android:id="@+id/ed_jdqControl"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="ff"
+                android:textSize="18dp" />
+
+            <Button
+                android:id="@+id/btn_jdqControl"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="发送命令" />
+            <Button
+                android:id="@+id/btn_jdq_searchStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="查看寄电器状态" />
+        </LinearLayout>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/tv_log"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"/>
+</LinearLayout>
