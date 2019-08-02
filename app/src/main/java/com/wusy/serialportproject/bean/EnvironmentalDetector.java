@@ -1,6 +1,6 @@
 package com.wusy.serialportproject.bean;
 
-import android.util.Log;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ public class EnvironmentalDetector {
             this.PM2_5OutDoor=Integer.parseInt(hexs.get(6),16);
             this.formaldehyde=((double)Integer.parseInt(hexs.get(7),16))/1000;
         }catch (Exception e){
-            Log.e("msg","解析环境数据发生错误",e);
+            Logger.e("解析环境数据发生错误",e);
         }
 
     }

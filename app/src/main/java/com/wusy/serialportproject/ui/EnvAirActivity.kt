@@ -20,7 +20,6 @@ import com.wusy.serialportproject.proxy.ClickProxy
 import com.wusy.serialportproject.util.CommonConfig
 import com.wusy.serialportproject.util.SerialCMD
 import com.wusy.wusylibrary.base.BaseActivity
-import com.wusy.wusylibrary.util.LoadingViewUtil
 import kotlinx.android.synthetic.main.activity_env_air.*
 import java.util.ArrayList
 
@@ -34,7 +33,6 @@ class EnvAirActivity : BaseActivity() {
         const val Hairdryer = 4
     }
 
-    private var loadingDialog: Dialog? = null
     private var boradCast: EnvAirBoradCast? = null
     private val buffer = StringBuffer()
     private var sendBean: SendBean = SendBean()
@@ -51,7 +49,6 @@ class EnvAirActivity : BaseActivity() {
     }
 
     override fun init() {
-        loadingDialog = LoadingViewUtil.getInstance().createLoadingDialog(this, "请稍后")
         initClick()
         initBroadCast()
         initThread()
@@ -150,7 +147,7 @@ class EnvAirActivity : BaseActivity() {
         var intent = Intent()
         intent.putExtra("data", "send")
         intent.putExtra("msg", msg)
-        Logger.i("send serial broadcat msg=$msg")
+        Logger.d("EmvAorActivity发送串口数据=$msg")
         intent.action = CommonConfig.SERIALPORTPROJECT_ACTION_SP_SERVICE
         sendBroadcast(intent)
     }
@@ -172,7 +169,7 @@ class EnvAirActivity : BaseActivity() {
             when (msg.what) {
                 0//环境检测仪获取到的数据
                 -> {
-                    Logger.i("获取的环境检测仪的数据" + msg.obj)
+                    Logger.d("获取的环境检测仪的数据" + msg.obj)
                     val enD = EnvironmentalDetector(msg.obj.toString())
                     Logger.i(
                         "---------经分析--------\n" +
@@ -209,7 +206,7 @@ class EnvAirActivity : BaseActivity() {
                     }
                 }
                 1 -> {
-                    Logger.i("获取的寄电器状态的数据" + msg.obj)
+                    Logger.d("获取的寄电器状态的数据" + msg.obj)
                     val data = msg.obj.toString().substring(16, 18)
                     if (sendBean != null && sendBean.isSend) {
                         //如果有控制命令，则讲获取的数据转为二进制，更改为要发送的二进制，在转成16进制发送
@@ -281,8 +278,6 @@ class EnvAirActivity : BaseActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == CommonConfig.SERIALPORTPROJECT_ACTION_SP_UI) {
                 val data = intent.getStringExtra("msg")
-                Logger.i("get SerialPort msg by BroadCast-HJL_ACTION_SERIALPORT_MSG=$data")
-
                 buffer.append(data)
                 if (buffer.toString().length > 4 && buffer.toString().substring(0, 4) == "0103") {//环境探测器数据
                     val message = Message.obtain()

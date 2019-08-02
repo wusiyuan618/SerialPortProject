@@ -17,6 +17,9 @@ class SerialPortService : Service(){
     private lateinit var serialPortBradCast:SerialPortBradCast
     lateinit var intentFilter:IntentFilter
     lateinit var serialPortUtilS2:SerialPortUtil
+    val SerialPort="/dev/ttyS2"
+    val Baudrate=9600
+
     override fun onCreate() {
         Logger.d("SerialPortService star")
         super.onCreate()
@@ -32,7 +35,8 @@ class SerialPortService : Service(){
     private fun initSerialPort(){
         serialPortUtilS2= SerialPortUtil(handler)
 
-        serialPortUtilS2.openSerialPort("/dev/ttyS2",9600)
+        serialPortUtilS2.openSerialPort(SerialPort,Baudrate)
+        Logger.d("系统启动串口:$SerialPort\t匹配波特率：$Baudrate")
 
     }
 

@@ -3,6 +3,7 @@ package com.wusy.serialportproject.util;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import com.orhanobut.logger.Logger;
 import com.wits.serialport.SerialPort;
 
 import java.io.File;
@@ -28,10 +29,8 @@ public class SerialPortUtil {
     public SerialPortUtil(Handler handler) {
         this.handler = handler;
     }
-
     private final String PATH = "/dev/ttyS2";
     private final int BAUDRATE = 9600;
-    private final int FLAGS = 0;
 
     /**
      * 打开串口，接收数据
@@ -45,7 +44,7 @@ public class SerialPortUtil {
             outputStream = serialPort.getOutputStream();
             isStart = true;
         } catch (IOException e) {
-            Log.e("wsy", "openSerialPort()", e);
+            Logger.e(e,"openSerialPort()");
             e.printStackTrace();
         }
         getSerialPort();
@@ -56,7 +55,6 @@ public class SerialPortUtil {
      * 关闭串口中的输入输出流
      */
     public void closeSerialPort() {
-        Log.i("wsy", "关闭串口");
         try {
             if (inputStream != null) {
                 inputStream.close();
@@ -115,7 +113,7 @@ public class SerialPortUtil {
                         handler.sendMessage(message);
                     }
                 } catch (Exception e) {
-                    Log.e("wsy", "ReceiveThread", e);
+                    Logger.e( e,"ReceiveThread");
                 }
             }
 
