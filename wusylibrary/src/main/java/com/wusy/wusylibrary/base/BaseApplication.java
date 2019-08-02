@@ -5,6 +5,7 @@ import android.app.Application;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
+import com.wusy.wusylibrary.util.loggerExpand.MyDiskLogAdapter;
 
 public class BaseApplication extends Application {
     @Override
@@ -20,6 +21,7 @@ public class BaseApplication extends Application {
                 .tag("LOGGER_WUSY")//（可选）每个日志的全局标记。 默认PRETTY_LOGGER
                 .build();
         Logger.addLogAdapter(new AndroidLogAdapter(formatStrategy));//根据上面的格式设置logger相应的适配器
-//        Logger.addLogAdapter(new DiskLogAdapter());//保存到文件
+        Logger.addLogAdapter(new MyDiskLogAdapter());//保存到文件
+//        Logger.addLogAdapter(new DiskLogAdapter());//
     }
 }
