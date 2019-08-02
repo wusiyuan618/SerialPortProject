@@ -46,6 +46,7 @@ class EnvAirActivity : BaseActivity() {
         return R.layout.activity_env_air
     }
 
+
     override fun findView() {
     }
 
@@ -187,7 +188,8 @@ class EnvAirActivity : BaseActivity() {
                     content.text = "当前温度：" + enD.temp + "C\t当前湿度：" + enD.humidity + "%RH\t" +
                             "当前TVOC：" + enD.tvoc + "mg/m3\t当前二氧化碳：" + enD.cO2 + "ppm"
                     if (isStartAutoCryogen) {//如果开启了自动制冷功能
-                        if (enD.temp > 24 && !envAirCryogen.isSelected) {
+                        if (enD.temp >= 24 ) {
+                            if(envAirCryogen.isSelected)return
                             changeStatusOfView(envAirCryogen, true)
                             sendBean = SendBean().apply {
                                 isSend = true
