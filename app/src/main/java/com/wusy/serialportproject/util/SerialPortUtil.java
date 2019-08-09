@@ -2,7 +2,6 @@ package com.wusy.serialportproject.util;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import com.orhanobut.logger.Logger;
 import com.wits.serialport.SerialPort;
 
@@ -116,8 +115,6 @@ public class SerialPortUtil {
                     Logger.e( e,"ReceiveThread");
                 }
             }
-
         }
     }
-
 }
