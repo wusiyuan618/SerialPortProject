@@ -24,6 +24,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.CenterActivity"/>
+        <activity android:name=".ui.RightActivity"/>
+        <activity android:name=".ui.LeftActivity"/>
+        <activity android:name=".ui.TopActivity"/>
+        <activity android:name=".ui.BottomActivity"/>
+        <activity android:name=".ui.SettingActivity"/>
         <service
                 android:name=".service.SerialPortService"
                 android:exported="true"

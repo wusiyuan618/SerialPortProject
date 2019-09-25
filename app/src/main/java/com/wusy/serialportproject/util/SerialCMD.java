@@ -1,7 +1,5 @@
 package com.wusy.serialportproject.util;
 
-import com.wusy.serialportproject.bean.SendBean;
-
 public class SerialCMD {
     /**
      * 查询环境探测器数据

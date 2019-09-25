@@ -9,7 +9,7 @@ import com.wusy.wusylibrary.base.BaseApplication
 class AndroidApplication : BaseApplication(){
     private val restartHandler = Thread.UncaughtExceptionHandler { _, ex ->
         Logger.e(ex, Thread.currentThread().toString() + "--APP异常捕获uncaughtException")
-        restartApp()
+//        restartApp()
     }
     override fun onCreate() {
         super.onCreate()
