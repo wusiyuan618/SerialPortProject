@@ -259,4 +259,19 @@ public class DataUtils {
         // 交换高低位，低位在前高位在后
         return result.substring(2, 4) + "" + result.substring(0, 2);
     }
+    /**
+     *  格式化电话号码
+     * 限制传入11位
+     */
+    public static String formatPhoneNumber(String str,String rep) {
+        StringBuilder result= new StringBuilder();
+        char[] chars=str.toCharArray();
+        for(int i=0;i<chars.length;i++){
+            if(i==3||i==7){
+                result.append(rep);
+            }
+            result.append(chars[i]);
+        }
+        return result.toString();
+    }
 }

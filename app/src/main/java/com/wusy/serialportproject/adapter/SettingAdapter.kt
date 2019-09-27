@@ -13,8 +13,6 @@ import com.wusy.serialportproject.bean.SettingBean
 import com.wusy.serialportproject.popup.NumberBoxPopup
 import com.wusy.serialportproject.viewHolder.SettingViewHolder
 import com.wusy.wusylibrary.base.BaseRecyclerAdapter
-import com.wusy.wusylibrary.view.NumberKeyBoxView
-import com.wusy.wusylibrary.view.PwdIndicator
 
 class SettingAdapter(context: Context) : BaseRecyclerAdapter<SettingBean>(context) {
     var fm: FragmentManager? = null
@@ -69,14 +67,11 @@ class SettingAdapter(context: Context) : BaseRecyclerAdapter<SettingBean>(contex
     }
 
     private fun beginEditPwd(position: Int) {
-        var view = numberBoxPopup.contentView
-        var pwdIndicator = view.findViewById<PwdIndicator>(R.id.pwdindicator)
-        var numberKeyBoxView = view.findViewById<NumberKeyBoxView>(R.id.numberkeyboxview)
         pwds.clear()
-        pwdIndicator.clear()
+        numberBoxPopup.pwdIndicator.clear()
         numberBoxPopup.showPopupWindow()
-        pwdIndicator.initIndicator(6)
-        numberKeyBoxView.setNumberKeyBoxViewClick {
+        numberBoxPopup.pwdIndicator.initIndicator(6)
+        numberBoxPopup.numberKeyBoxView.setNumberKeyBoxViewClick {
             when (it) {
                 "ok" -> {
                     if (pwds.size < 6) {
@@ -95,12 +90,12 @@ class SettingAdapter(context: Context) : BaseRecyclerAdapter<SettingBean>(contex
                     numberBoxPopup.dismiss()
                 }
                 "delete" -> {
-                    if (pwdIndicator.remove()) {
+                    if (numberBoxPopup.pwdIndicator.remove()) {
                         if (pwds.size != 0) pwds.removeAt(pwds.size - 1)
                     }
                 }
                 else -> {
-                    if (pwdIndicator.add()) {
+                    if (numberBoxPopup.pwdIndicator.add()) {
                         pwds.add(it)
                     }
                 }

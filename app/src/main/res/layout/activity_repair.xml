@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:background="@mipmap/bg"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:layout_width="280dp"
+            android:layout_height="match_parent">
+        <ImageView
+                android:id="@+id/ivBack"
+                android:layout_marginTop="72dp"
+                android:layout_marginLeft="92dp"
+                android:src="@mipmap/btn_back"
+                android:layout_width="80dp"
+                android:layout_height="48dp"/>
+    </RelativeLayout>
+    <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/fragmentBox"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+        <TextView
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:text="报修"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:textColor="#ffffff"
+                android:layout_marginTop="40dp"
+                android:textSize="30sp"
+                android:text="全国客户服务热线：023-2356-4578"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:id="@+id/tvDLSPhone"
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:layout_marginTop="40dp"
+                android:text="代理商联系电话：187-5656-8745"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</LinearLayout>

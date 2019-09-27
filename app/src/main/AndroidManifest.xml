@@ -30,6 +30,7 @@
         <activity android:name=".ui.TopActivity"/>
         <activity android:name=".ui.BottomActivity"/>
         <activity android:name=".ui.SettingActivity"/>
+        <activity android:name=".ui.RepairActivity"/>
         <service
                 android:name=".service.SerialPortService"
                 android:exported="true"

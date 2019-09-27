@@ -109,6 +109,9 @@ class EnvAirActivity : BaseTouchActivity() {
         rlSetting.setOnClickListener {
             navigateTo(SettingActivity::class.java)
         }
+        rlRepair.setOnClickListener {
+            navigateTo(RepairActivity::class.java)
+        }
     }
 
     private fun initControlRecycler() {

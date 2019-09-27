@@ -9,7 +9,7 @@
     <TextView
             android:text="输入密码"
             android:textSize="30dp"
-            android:textColor="#00ffc0"
+            android:textColor="#ffffff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     <com.wusy.wusylibrary.view.PwdIndicator

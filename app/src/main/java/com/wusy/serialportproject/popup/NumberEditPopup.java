@@ -3,31 +3,36 @@ package com.wusy.serialportproject.popup;
 import android.content.Context;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.TextView;
 import com.wusy.serialportproject.R;
 import com.wusy.wusylibrary.view.NumberKeyBoxView;
-import com.wusy.wusylibrary.view.PwdIndicator;
 import razerdp.basepopup.BasePopupWindow;
 
 /**
  * Created by XIAO RONG on 2019/1/4.
  */
 
-public class NumberBoxPopup extends BasePopupWindow {
-    private PwdIndicator pwdIndicator;
+public class NumberEditPopup extends BasePopupWindow {
+    private TextView tvTitle,tvContent,tvEditContent;
     private NumberKeyBoxView numberKeyBoxView;
-
-    public NumberBoxPopup(Context context) {
+    public NumberEditPopup(Context context) {
         super(context);
         setBlurBackgroundEnable(true);
         findView();
+        init();
     }
     private void findView(){
-        pwdIndicator=getContentView().findViewById(R.id.pwdindicator);
+        tvTitle=getContentView().findViewById(R.id.tvTitle);
+        tvContent=getContentView().findViewById(R.id.tvContent);
+        tvEditContent=getContentView().findViewById(R.id.tvEditContent);
         numberKeyBoxView=getContentView().findViewById(R.id.numberkeyboxview);
+    }
+    private void init(){
+
     }
     @Override
     public View onCreateContentView() {
-        return createPopupById(R.layout.dialog_numberkeybox);
+        return createPopupById(R.layout.dialog_numberedit);
     }
 
     @Override
@@ -40,8 +45,16 @@ public class NumberBoxPopup extends BasePopupWindow {
         return getDefaultScaleAnimation(false);
     }
 
-    public PwdIndicator getPwdIndicator() {
-        return pwdIndicator;
+    public TextView getTvTitle() {
+        return tvTitle;
+    }
+
+    public TextView getTvContent() {
+        return tvContent;
+    }
+
+    public TextView getTvEditContent() {
+        return tvEditContent;
     }
 
     public NumberKeyBoxView getNumberKeyBoxView() {

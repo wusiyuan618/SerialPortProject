@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical" android:layout_width="800dp"
+              android:layout_height="wrap_content"
+              android:padding="10dp"
+              android:layout_gravity="center"
+              android:gravity="center">
+    <TextView
+            android:id="@+id/tvTitle"
+            android:text="修改代理商联系方式"
+            android:textSize="30sp"
+            android:textColor="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <TextView
+            android:id="@+id/tvContent"
+            android:layout_marginTop="42dp"
+            android:text="当前代理商电话：187-5656-8778"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    <TextView
+            android:id="@+id/tvEditContent"
+            android:textSize="24sp"
+            android:background="@drawable/border"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:textColor="#FFFFFF"
+            android:layout_width="match_parent"
+            android:layout_height="62dp"/>
+
+    <com.wusy.wusylibrary.view.NumberKeyBoxView
+            android:id="@+id/numberkeyboxview"
+            android:layout_marginTop="60px"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"/>
+</LinearLayout>
