@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools" package="com.wusy.serialportproject">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
@@ -14,27 +14,30 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.EnvAirActivity">
+        <activity android:name=".ui.EnvAirActivity"
+                  android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
 
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.CenterActivity"/>
-        <activity android:name=".ui.RightActivity"/>
-        <activity android:name=".ui.LeftActivity"/>
-        <activity android:name=".ui.TopActivity"/>
-        <activity android:name=".ui.BottomActivity"/>
+        <activity android:name=".ui.test.CenterActivity"/>
+        <activity android:name=".ui.test.RightActivity"/>
+        <activity android:name=".ui.test.LeftActivity"/>
+        <activity android:name=".ui.test.TopActivity"/>
+        <activity android:name=".ui.test.BottomActivity"/>
         <activity android:name=".ui.SettingActivity"/>
         <activity android:name=".ui.RepairActivity"/>
+        <activity android:name=".ui.ScreenActivity"/>
         <service
                 android:name=".service.SerialPortService"
                 android:exported="true"
-                android:process=":sps" />
+                android:process=":sps"/>
+        <service android:name=".service.ScreenService"/>
     </application>
 
 </manifest>

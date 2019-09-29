@@ -5,12 +5,13 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.wusy.serialportproject.R
 import com.wusy.serialportproject.adapter.SettingAdapter
+import com.wusy.serialportproject.app.BaseTouchActivity
 import com.wusy.serialportproject.bean.SettingBean
 import com.wusy.wusylibrary.base.BaseActivity
 import com.wusy.wusylibrary.base.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_setting.*
 
-class SettingActivity:BaseActivity(){
+class SettingActivity: BaseTouchActivity(){
     lateinit var adapter:SettingAdapter
     override fun findView() {
 
@@ -44,6 +45,12 @@ class SettingActivity:BaseActivity(){
             this.isSelect=false
             this.fragment=FreshSettingFragment()
             ft.add(R.id.fragmentBox,this.fragment as FreshSettingFragment,"FreshSettingFragment")
+        })
+        list.add(SettingBean().apply {
+            this.title="增值服务"
+            this.isSelect=false
+            this.fragment=ValueAddedFragment()
+            ft.add(R.id.fragmentBox,this.fragment as ValueAddedFragment,"ValueAddedFragment")
         })
         list.add(SettingBean().apply {
             this.title="系统设置"

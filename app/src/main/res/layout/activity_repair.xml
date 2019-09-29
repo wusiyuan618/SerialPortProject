@@ -34,7 +34,7 @@
                 android:textColor="#ffffff"
                 android:layout_marginTop="40dp"
                 android:textSize="30sp"
-                android:text="全国客户服务热线：023-2356-4578"
+                android:text="全国客户服务热线：023 - 2356 - 4578"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         <TextView
@@ -42,7 +42,7 @@
                 android:textColor="#ffffff"
                 android:textSize="30sp"
                 android:layout_marginTop="40dp"
-                android:text="代理商联系电话：187-5656-8745"
+                android:text="代理商联系电话：187 - 5656 - 8745"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

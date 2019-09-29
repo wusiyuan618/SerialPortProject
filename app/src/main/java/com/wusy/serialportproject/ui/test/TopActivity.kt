@@ -1,4 +1,4 @@
-package com.wusy.serialportproject.ui
+package com.wusy.serialportproject.ui.test
 
 import com.wusy.serialportproject.R
 import com.wusy.serialportproject.app.BaseTouchActivity

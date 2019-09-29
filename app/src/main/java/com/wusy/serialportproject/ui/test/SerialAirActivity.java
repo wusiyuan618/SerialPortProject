@@ -1,4 +1,4 @@
-package com.wusy.serialportproject.ui;
+package com.wusy.serialportproject.ui.test;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

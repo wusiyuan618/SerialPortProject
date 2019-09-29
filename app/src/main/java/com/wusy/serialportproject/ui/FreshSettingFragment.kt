@@ -17,10 +17,10 @@ class FreshSettingFragment:BaseFragment(){
         tvTitle.text="新风时间"
         tvContent.text="设置开启新风持续时间"
         wheel.data= createList()
-        wheel.setSelectedItemPosition(SharedPreferencesUtil.getInstance(context).getData(Constants.FRESHSETTINGPOSITION,0).toString().toInt(),false)
+        wheel.setSelectedItemPosition(SharedPreferencesUtil.getInstance(context).getData(Constants.FRESH_SETTING_POSITION,0).toString().toInt(),false)
         wheel.setOnItemSelectedListener { _, data, position ->
-            SharedPreferencesUtil.getInstance(context).saveData(Constants.FRESHSETTINGTIME,data)
-            SharedPreferencesUtil.getInstance(context).saveData(Constants.FRESHSETTINGPOSITION,position)
+            SharedPreferencesUtil.getInstance(context).saveData(Constants.FRESH_SETTING_TIME,data)
+            SharedPreferencesUtil.getInstance(context).saveData(Constants.FRESH_SETTING_POSITION,position)
         }
     }
 

@@ -2,6 +2,7 @@ package com.wusy.serialportproject.app
 
 import android.content.Intent
 import com.orhanobut.logger.Logger
+import com.wusy.serialportproject.service.ScreenService
 import com.wusy.serialportproject.service.SerialPortService
 import com.wusy.serialportproject.ui.EnvAirActivity
 import com.wusy.wusylibrary.base.BaseApplication
@@ -14,12 +15,23 @@ class AndroidApplication : BaseApplication(){
     override fun onCreate() {
         super.onCreate()
         startSerialPortService()
+        startScreenService()
         Thread.setDefaultUncaughtExceptionHandler(restartHandler) // 程序崩溃时触发线程  以下用来捕获程序崩溃异常
 
     }
 
+    /**
+     * 启动串口服务
+     */
     private fun startSerialPortService(){
         var intent=Intent(this,SerialPortService::class.java)
+        startService(intent)
+    }
+    /**
+     * 启动屏保服务
+     */
+    private fun startScreenService(){
+        var intent=Intent(this,ScreenService::class.java)
         startService(intent)
     }
     private fun restartApp() {

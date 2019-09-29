@@ -87,7 +87,7 @@ class SystemSettingFragment : BaseFragment() {
     private fun initSetPhonePop() {
         setPhoneNumberEidtPopup = NumberEditPopup(context)
         setPhoneNumberEidtPopup.tvTitle.text = "发送运行分析数据"
-        setPhoneNumberEidtPopup.tvContent.text = "当前代理商电话：" + DataUtils.formatPhoneNumber(SharedPreferencesUtil.getInstance(context).getData(Constants.DEFAULTDLSPHONE, Constants.DEFAULTDLSPHONENUMBER).toString()," - ")
+        setPhoneNumberEidtPopup.tvContent.text = "当前代理商电话：" + DataUtils.formatPhoneNumber(SharedPreferencesUtil.getInstance(context).getData(Constants.DEFAULT_DLS_PHONE, Constants.DEFAULT_DLS_PHONENUMBER).toString()," - ")
         setPhoneNumberEidtPopup.numberKeyBoxView.setNumberKeyBoxViewClick {
             when (it) {
                 "ok" -> {
@@ -96,9 +96,11 @@ class SystemSettingFragment : BaseFragment() {
                         return@setNumberKeyBoxViewClick
                     }
                     SharedPreferencesUtil.getInstance(context)
-                        .saveData(Constants.DEFAULTDLSPHONE, setPhoneNumberEidtPopup.tvEditContent.text.toString())
+                        .saveData(Constants.DEFAULT_DLS_PHONE, setPhoneNumberEidtPopup.tvEditContent.text.toString())
                     setPhoneNumberEidtPopup.tvEditContent.text = ""
+                    setPhoneNumberEidtPopup.tvContent.text = "当前代理商电话：" + DataUtils.formatPhoneNumber(SharedPreferencesUtil.getInstance(context).getData(Constants.DEFAULT_DLS_PHONE, Constants.DEFAULT_DLS_PHONENUMBER).toString()," - ")
                     setPhoneNumberEidtPopup.dismiss()
+                    showToast("修改成功")
                 }
                 "delete" -> {
                     if (setPhoneNumberEidtPopup.tvEditContent.text.toString().isNotEmpty()) {

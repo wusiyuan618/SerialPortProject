@@ -82,7 +82,7 @@ class SettingAdapter(context: Context) : BaseRecyclerAdapter<SettingBean>(contex
                     for (i in pwds.indices) {
                         pwd += pwds[i]
                     }
-                    if (pwd == Constants.SYSTEMSETTINGPWD) {
+                    if (pwd == Constants.DEFAULT_SYSTEM_SETTINGPWD) {
                         changeSelectStatus(position)
                     } else {
                         Toast.makeText(context, "密码错误", Toast.LENGTH_SHORT).show()

@@ -15,6 +15,7 @@ import com.orhanobut.logger.Logger
 import com.wusy.serialportproject.R
 import com.wusy.serialportproject.adapter.EnvAirAdapter
 import com.wusy.serialportproject.app.BaseTouchActivity
+import com.wusy.serialportproject.app.Constants
 import com.wusy.serialportproject.bean.EnvironmentalDetector
 import com.wusy.serialportproject.bean.EnvAirControlBean
 import com.wusy.serialportproject.util.CommonConfig
@@ -290,8 +291,13 @@ class EnvAirActivity : BaseTouchActivity() {
                 0//环境检测仪获取到的数据
                 -> {
                     Logger.d("获取的环境检测仪的数据" + msg.obj)
+                    //将确定是环境探测器的数据通过广播发出去,并且存储全局数据。方便屏保使用
+                    var intent=Intent(CommonConfig.ACTION_ENVIRONMENTALDETECOTOR_DATA)
+                    intent.putExtra("data",msg.obj.toString())
+                    sendBroadcast(intent)
                     val enD = EnvironmentalDetector(msg.obj.toString())
-                    Logger.i(
+                    Constants.curED=enD
+                        Logger.i(
                         "---------经分析--------\n" +
                                 "PM2.5=" + enD.pM2_5 + "\n" +
                                 "温度=" + enD.temp + "\n" +

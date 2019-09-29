@@ -3,6 +3,7 @@ package com.wusy.serialportproject.app
 import android.util.Log
 import android.view.MotionEvent
 import com.wusy.wusylibrary.base.BaseActivity
+import java.util.*
 
 abstract class BaseTouchActivity : BaseActivity(){
     private var downX: Float=0.0f
@@ -55,4 +56,10 @@ abstract class BaseTouchActivity : BaseActivity(){
     open fun onFingerBottomTouch(){
 
     }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        Constants.lastUpdateTime= Date(System.currentTimeMillis())
+        return super.dispatchTouchEvent(ev)
+    }
+
 }

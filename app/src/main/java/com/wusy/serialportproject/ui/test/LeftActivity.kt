@@ -1,31 +1,31 @@
-package com.wusy.serialportproject.ui
+package com.wusy.serialportproject.ui.test
 
 import com.wusy.serialportproject.R
 import com.wusy.serialportproject.app.BaseTouchActivity
 import com.wusy.wusylibrary.base.BaseActivity
-import kotlinx.android.synthetic.main.activity_right.*
+import kotlinx.android.synthetic.main.activity_left.*
 
-class RightActivity : BaseTouchActivity(){
+class LeftActivity : BaseTouchActivity(){
     override fun getContentViewId(): Int {
-        return R.layout.activity_right
+        return R.layout.activity_left
     }
 
     override fun findView() {
     }
 
     override fun init() {
-        left.setOnClickListener {
+        right.setOnClickListener {
             startFinish()
         }
     }
 
-    override fun onFingerRightTouch() {
-        super.onFingerRightTouch()
+    override fun onFingerLeftTouch() {
+        super.onFingerLeftTouch()
         startFinish()
     }
     private fun startFinish(){
         finish()
-        overridePendingTransition(R.anim.left_to_center, R.anim.center_to_right)
+        overridePendingTransition(R.anim.right_to_center, R.anim.center_to_left)
     }
 
 }

@@ -1,7 +1,5 @@
 package com.wusy.serialportproject.ui
 
-import android.graphics.Color
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.aigestudio.wheelpicker.WheelPicker
@@ -18,10 +16,10 @@ class ScreenSettingFragment:BaseFragment(){
         tvTitle.text="屏保时间"
         tvContent.text="请设置锁屏时间"
         wheel.data= createList()
-        wheel.setSelectedItemPosition(SharedPreferencesUtil.getInstance(context).getData(Constants.SCREENSETTINGPOSITION,0).toString().toInt(),false)
+        wheel.setSelectedItemPosition(SharedPreferencesUtil.getInstance(context).getData(Constants.SCREEN_SETTING_POSITION,5).toString().toInt(),false)
         wheel.setOnItemSelectedListener { _, data, position ->
-            SharedPreferencesUtil.getInstance(context).saveData(Constants.SCREENSETTINGTIME,data)
-            SharedPreferencesUtil.getInstance(context).saveData(Constants.SCREENSETTINGPOSITION,position)
+            SharedPreferencesUtil.getInstance(context).saveData(Constants.SCREEN_SETTING_TIME,data)
+            SharedPreferencesUtil.getInstance(context).saveData(Constants.SCREEN_SETTING_POSITION,position)
         }
     }
 
