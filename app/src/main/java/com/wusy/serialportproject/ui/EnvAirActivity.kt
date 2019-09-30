@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Message
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.widget.Toast
 import com.orhanobut.logger.Logger
 import com.wusy.serialportproject.R
@@ -21,6 +22,7 @@ import com.wusy.serialportproject.bean.EnvAirControlBean
 import com.wusy.serialportproject.util.CommonConfig
 import com.wusy.serialportproject.util.JDQType
 import com.wusy.serialportproject.util.SerialCMD
+import com.wusy.serialportproject.view.CirqueProgressControlView
 import com.wusy.wusylibrary.base.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_envair.*
 import java.util.*
@@ -91,13 +93,17 @@ class EnvAirActivity : BaseTouchActivity() {
     @SuppressLint("SetTextI18n")
     private fun initView() {
         initControlRecycler()
-        tempControlView.setTemp(minTemp,maxTemp, curTemp)
-        tempCount.text=curTemp.toString()
-        tempControlView.setOnTempChangedListener {
-            curTemp=it
-            tempCount.text=curTemp.toString()
-            Logger.i("当前温度：$it")
-        }
+        tempControlView.setProgressRange(16, 32)//可以在xml中指定，也可以在代码中设置
+        tempControlView.setProgress(27)  //添加默认数据--注:不能超出范围
+        tempControlView.setOnTextFinishListener(object : CirqueProgressControlView.OnCirqueProgressChangeListener{
+            override fun onChange(minProgress: Int, maxProgress: Int, progress: Int) {
+                Log.i("wsy",progress.toString() + "")
+            }
+
+            override fun onChangeEnd(minProgress: Int, maxProgress: Int, progress: Int) {
+                Log.i("wsy", "control finish. last progress is $progress")
+            }
+        })
         tvON.setOnClickListener {
             tvON.setTextColor(Color.parseColor("#2793FF"))
             tvOFF.setTextColor(Color.parseColor("#FFFFFF"))
