@@ -20,7 +20,7 @@ class EnvAirAdapter(context: Context) : BaseRecyclerAdapter<EnvAirControlBean>(c
     override fun onMyBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
         if(holder is EnvAriControlViewHolder){
             val thisHolder=holder as EnvAriControlViewHolder
-            thisHolder.ivBg.setBackgroundResource(if(list[position].isOpen) list[position].imgResourceSelect?:0 else list[position].imgResourceNormal?:0 )
+            thisHolder.ivBg.setBackgroundResource(if(list[position].isSelect) list[position].imgResourceSelect?:0 else list[position].imgResourceNormal?:0 )
             thisHolder.tvContent.text=list[position].content
         }
     }

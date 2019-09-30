@@ -25,6 +25,7 @@ class EnvAirControlBean{
 
     }
     var isSend=false
+    var isSelect=false
     var switchIndex=0
     var isOpen=false
     var type:Int?=null
