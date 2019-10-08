@@ -39,7 +39,7 @@ public class SerialCMD {
         String address="05";
         String indexStr="";
         if(index<16) indexStr="000"+Integer.toHexString(index);
-        else indexStr="0010";//最多16个
+        else indexStr="0015";//最多16个
         String openStr="";
         if(isOpen) openStr="FF00";
         else openStr="0000";

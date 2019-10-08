@@ -378,7 +378,6 @@ public class CirqueProgressControlView extends View {
      * @param canvas canvas
      */
     private void drawDragBitmap(Canvas canvas) {
-        Log.i("wsy",mCurrentAngle+"");
         PointF progressPoint = ChartUtils.calcArcEndPointXY(mCenterX, mCenterY, mRadius,
                 mCurrentAngle, startAngle);
 

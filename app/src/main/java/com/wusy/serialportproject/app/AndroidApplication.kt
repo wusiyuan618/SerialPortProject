@@ -6,6 +6,7 @@ import com.wusy.serialportproject.service.ScreenService
 import com.wusy.serialportproject.service.SerialPortService
 import com.wusy.serialportproject.ui.EnvAirActivity
 import com.wusy.wusylibrary.base.BaseApplication
+import com.wusy.wusylibrary.util.loggerExpand.MyDiskLogAdapter
 
 class AndroidApplication : BaseApplication(){
     private val restartHandler = Thread.UncaughtExceptionHandler { _, ex ->
@@ -14,6 +15,7 @@ class AndroidApplication : BaseApplication(){
     }
     override fun onCreate() {
         super.onCreate()
+        Logger.addLogAdapter(MyDiskLogAdapter())
         startSerialPortService()
         startScreenService()
         Thread.setDefaultUncaughtExceptionHandler(restartHandler) // 程序崩溃时触发线程  以下用来捕获程序崩溃异常

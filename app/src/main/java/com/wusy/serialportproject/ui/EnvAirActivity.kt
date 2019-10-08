@@ -74,6 +74,9 @@ class EnvAirActivity : BaseTouchActivity() {
     private var curTemp = 25
     private val minTemp = 16
     private val maxTemp = 32
+
+    private val isCryogen=true
+    private val isHeating=false
     override fun getContentViewId(): Int {
         return R.layout.activity_envair
     }
@@ -86,8 +89,6 @@ class EnvAirActivity : BaseTouchActivity() {
         initView()
         initBroadCast()
         initThread()
-        Thread.sleep(1000)
-        sendJDQSearch()
     }
 
     @SuppressLint("SetTextI18n")
@@ -112,6 +113,9 @@ class EnvAirActivity : BaseTouchActivity() {
         tvOFF.setOnClickListener {
             tvON.setTextColor(Color.parseColor("#FFFFFF"))
             tvOFF.setTextColor(Color.parseColor("#2793FF"))
+            for (i in 1..16){
+
+            }
         }
         rlSetting.setOnClickListener {
             navigateTo(SettingActivity::class.java)
@@ -127,7 +131,6 @@ class EnvAirActivity : BaseTouchActivity() {
         var list = ArrayList<EnvAirControlBean>()
         list.add(EnvAirControlBean().apply {
             this.isOpen = false
-            this.isSelect = false
             this.isSend = false
             this.type = EnvAirControlBean.TYPE_Cryogen
             this.switchIndex = MODE_Cryogen
@@ -137,7 +140,6 @@ class EnvAirActivity : BaseTouchActivity() {
         })
         list.add(EnvAirControlBean().apply {
             this.isOpen = false
-            this.isSelect = false
             this.isSend = false
             this.type = EnvAirControlBean.TYPE_Heating
             this.switchIndex = MODE_Heating
@@ -147,7 +149,6 @@ class EnvAirActivity : BaseTouchActivity() {
         })
         list.add(EnvAirControlBean().apply {
             this.isOpen = false
-            this.isSelect = false
             this.isSend = false
             this.type = EnvAirControlBean.TYPE_Hairdryer
             this.switchIndex = MODE_Hairdryer
@@ -162,8 +163,7 @@ class EnvAirActivity : BaseTouchActivity() {
                 override fun onRecyclerItemClick(view: RecyclerView.ViewHolder?, position: Int) {
                     if (!isCanClick()) return
                     it.list[position].isSend = true
-                    it.list[position].isOpen = !it.list[position].isSelect
-                    it.list[position].isSelect = !it.list[position].isSelect
+                    it.list[position].isOpen = !it.list[position].isOpen
                     sendBean = it.list[position]
                     sendJDQControl()
                     it.notifyDataSetChanged()
@@ -180,8 +180,8 @@ class EnvAirActivity : BaseTouchActivity() {
             while (true) {
                 buffer.delete(0, buffer.length)//定时更新下数据存储器，防止出现骚问题
                 sendSerial(SerialCMD.EnvironmenttalSearch)
-//                Thread.sleep(1000)
-//                sendJDQSearch()  现在屏是控制的唯一入口，所以可以不用实施去更新空调状态
+                Thread.sleep(1000)
+                sendJDQSearch()
                 Thread.sleep(60 * 1000)
             }
         }).start()
@@ -209,10 +209,10 @@ class EnvAirActivity : BaseTouchActivity() {
     }
 
 
-    private fun changeStatusOfView(type: Int, isSelect: Boolean) {
+    private fun changeStatusOfView(type: Int, isOpen: Boolean) {
         var bean = searchControlBean(type)
         if (bean != null) {
-            bean.isSelect = isSelect
+            bean.isOpen = isOpen
             adapter!!.notifyDataSetChanged()
         }
     }
@@ -261,11 +261,15 @@ class EnvAirActivity : BaseTouchActivity() {
                 Thread(Runnable {
                     Thread.sleep(100)
                     sendSerial(SerialCMD.getZZSendControlCode(sendBean.switchIndex, sendBean.isOpen))
+                    Logger.i("发送了一条寄电器控制命令：$sendBean")
                 }).start()
             }
         }
     }
 
+    /**
+     * 查询寄电器状态
+     */
     private fun sendJDQSearch() {
         when (currentJDQType) {
             JDQType.SCHIDERON -> {
@@ -324,7 +328,6 @@ class EnvAirActivity : BaseTouchActivity() {
                     )
                     tvTempCount.text = enD.temp.toString()
                     tvHumidityCount.text = enD.humidity.toString()
-
                     autoCryogen(enD)
                     autoHeating(enD)
                 }
@@ -353,7 +356,7 @@ class EnvAirActivity : BaseTouchActivity() {
                     var list = getStatus(data, 16)
                     //解析到的list含义前8位，代表的继电器9--16，后8位代表的继电器1--8
                     //例如[0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0]代表1/2/5/12继电器点亮
-                    //这里我们从新组装哈数据的顺序，让1--16对应
+                    //这里我们从新组装数据的顺序，让1--16对应
                     var listNew = ArrayList<Int>()
                     for (i in 8 until 16) {
                         listNew.add(list[i])
@@ -363,7 +366,7 @@ class EnvAirActivity : BaseTouchActivity() {
                     }
                     adapter?.let {
                         for (bean in it.list) {
-                            bean.isSelect = listNew[bean.switchIndex] == 1
+                            bean.isOpen = listNew[bean.switchIndex] == 1
                         }
                         it.notifyDataSetChanged()
                     }
@@ -378,9 +381,10 @@ class EnvAirActivity : BaseTouchActivity() {
     private fun autoCryogen(enD: EnvironmentalDetector) {
         var cryogenControl = searchControlBean(EnvAirControlBean.TYPE_Cryogen)
         if (cryogenControl != null) {
-            if (cryogenControl.isSelect) {
+            if (isCryogen) {
                 if (enD.temp >= curTemp + 1) {
                     if (cryogenControl.isOpen) return
+                    changeStatusOfView(EnvAirControlBean.TYPE_Cryogen, true)
                     cryogenControl.isOpen = true
                     cryogenControl.isSend = true
                     sendBean = cryogenControl

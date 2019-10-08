@@ -1,17 +1,25 @@
 package com.wusy.serialportproject.ui
 
-import android.content.SharedPreferences
+import android.os.Build
+import android.os.Environment
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.Toast
+import com.orhanobut.logger.Logger
 import com.wusy.serialportproject.R
 import com.wusy.serialportproject.app.Constants
 import com.wusy.serialportproject.popup.MakeSurePopup
 import com.wusy.serialportproject.popup.NumberEditPopup
 import com.wusy.serialportproject.util.DataUtils
-import com.wusy.wusylibrary.base.BaseActivity
+import com.wusy.serialportproject.util.InterAddressUtil
 import com.wusy.wusylibrary.base.BaseFragment
+import com.wusy.wusylibrary.util.OkHttpUtil
 import com.wusy.wusylibrary.util.SharedPreferencesUtil
+import okhttp3.Call
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 
 class SystemSettingFragment : BaseFragment() {
     lateinit var rlReSet: RelativeLayout
@@ -72,16 +80,48 @@ class SystemSettingFragment : BaseFragment() {
         updateLogMakeSurePopup.tvTitle.text = "发送运行分析数据"
         updateLogMakeSurePopup.tvContent.text = "您是否需要发送运行分析数据呢？"
         updateLogMakeSurePopup.ivSure.setOnClickListener {
+            updateLogMakeSurePopup.dismiss()
             showLoadImage()
-            Thread(Runnable {
-                Thread.sleep(2000)
-                activity!!.runOnUiThread {
-                    hideLoadImage()
-                    showToast("成功上传日志")
-                    updateLogMakeSurePopup.dismiss()
-                }
-            }).start()
+            updateLog()
         }
+    }
+
+    /**
+     * 上传日志
+     *  最新日志下载地址---http://www.hjlapp.com:9201/root/pic/backGroundImg/logs/LogsByWusyLib_0.log
+     *
+     */
+    private fun updateLog(){
+        Logger.i("-----------------设备信息------------------")
+        Logger.i("设备制造商：" + Build.MANUFACTURER)
+        Logger.i("设备品牌：" + Build.BRAND)
+        Logger.i("设备型号：" + Build.MODEL)
+        Logger.i("系统版本：" + Build.VERSION.RELEASE)
+        Logger.i("mac地址："+ InterAddressUtil.getMacAddress())
+        Logger.i("-------------------------------------------")
+        var url = "http://www.hjlapp.com:9202/fileUpload/uploadFile"
+        var file = File(Environment.getExternalStorageDirectory().toString() + "/logger/LogsByWusyLib_0.log")
+        var maps = HashMap<String, String>()
+        maps["type"] = "1"
+        OkHttpUtil.getInstance().upLoadFile(url, "file", file, maps, object : OkHttpUtil.ResultCallBack {
+            override fun failListener(call: Call?, e: IOException?, message: String?) {
+                activity!!.runOnUiThread {
+                    showToast(message)
+                    hideLoadImage()
+                }
+            }
+
+            override fun successListener(call: Call?, response: Response?) {
+                var json = JSONObject(response?.body()?.string())
+                activity!!.runOnUiThread {
+                    if (json.getString("status") == "0")
+                        showToast("上传成功")
+                    else
+                        showToast("上传失败")
+                    hideLoadImage()
+                }
+            }
+        })
     }
 
     private fun initSetPhonePop() {
