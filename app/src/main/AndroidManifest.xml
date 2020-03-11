@@ -14,7 +14,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.EnvAirActivity"
+        <activity android:name=".ui.test.CenterActivity"
                   android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.test.CenterActivity"/>
+<!--        <activity android:name=".ui.test.CenterActivity"/>-->
         <activity android:name=".ui.test.RightActivity"/>
         <activity android:name=".ui.test.LeftActivity"/>
         <activity android:name=".ui.test.TopActivity"/>

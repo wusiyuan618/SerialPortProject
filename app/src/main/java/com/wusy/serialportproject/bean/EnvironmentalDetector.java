@@ -12,7 +12,7 @@ public class EnvironmentalDetector {
     private int PM2_5OutDoor;//室外PM2.5
     private double formaldehyde;//甲醛
     private double TVOC;//TVOC
-    ArrayList<String> hexs;
+    private ArrayList<String> hexs;
 
     public EnvironmentalDetector(String data){
         data=data.substring(6);
@@ -28,6 +28,17 @@ public class EnvironmentalDetector {
             this.TVOC=((double)Integer.parseInt(hexs.get(4),16))/100;
             this.PM2_5OutDoor=Integer.parseInt(hexs.get(6),16);
             this.formaldehyde=((double)Integer.parseInt(hexs.get(7),16))/1000;
+            Logger.i(
+                    "---------经分析--------\n" +
+                            "PM2.5=" + PM2_5 + "\n" +
+                            "温度=" + temp + "\n" +
+                            "湿度=" + humidity + "\n" +
+                            "CO2=" + CO2 + "\n" +
+                            "TVOC=" + TVOC + "\n" +
+                            "室外PM2.5=" + PM2_5OutDoor + "\n" +
+                            "甲醛=" + formaldehyde + "\n" +
+                            "-----------------------"
+            );
         }catch (Exception e){
             Logger.e("解析环境数据发生错误",e);
         }

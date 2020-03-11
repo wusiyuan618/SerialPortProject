@@ -18,7 +18,6 @@ import com.orhanobut.logger.Logger;
 import com.wusy.serialportproject.R;
 import com.wusy.serialportproject.bean.EnvironmentalDetector;
 import com.wusy.serialportproject.util.CommonConfig;
-import com.wusy.serialportproject.util.SerialCMD;
 
 import java.util.ArrayList;
 
@@ -54,27 +53,27 @@ public class SerialAirActivity extends Activity {
                 sendSerial(ed_send.getText().toString());
             }
         });
-        btn_searchEnv=findViewById(R.id.btn_searchEnv);
-        btn_searchEnv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendSerial(SerialCMD.EnvironmenttalSearch);
-            }
-        });
-        btn_jdqControl=findViewById(R.id.btn_jdqControl);
-        btn_jdqControl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendSerial(SerialCMD.getSendControlCode(ed_jdqControl.getText().toString()));
-            }
-        });
-        btn_jdqSearchStatus=findViewById(R.id.btn_jdq_searchStatus);
-        btn_jdqSearchStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendSerial(SerialCMD.JDQSearch);
-            }
-        });
+//        btn_searchEnv=findViewById(R.id.btn_searchEnv);
+//        btn_searchEnv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendSerial(SerialCMD.EnvironmenttalSearch);
+//            }
+//        });
+//        btn_jdqControl=findViewById(R.id.btn_jdqControl);
+//        btn_jdqControl.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendSerial(SerialCMD.getSendControlCode(ed_jdqControl.getText().toString()));
+//            }
+//        });
+//        btn_jdqSearchStatus=findViewById(R.id.btn_jdq_searchStatus);
+//        btn_jdqSearchStatus.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendSerial(SerialCMD.JDQSearch);
+//            }
+//        });
 
         tv_log=findViewById(R.id.tv_log);
     }

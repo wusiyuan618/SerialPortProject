@@ -10,7 +10,6 @@ import android.os.Handler
 import android.os.Message
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.widget.Toast
 import com.orhanobut.logger.Logger
 import com.wusy.serialportproject.R
@@ -19,15 +18,17 @@ import com.wusy.serialportproject.app.BaseTouchActivity
 import com.wusy.serialportproject.app.Constants
 import com.wusy.serialportproject.bean.EnvironmentalDetector
 import com.wusy.serialportproject.bean.EnvAirControlBean
+import com.wusy.serialportproject.devices.BaseDevices
+import com.wusy.serialportproject.devices.EnvQ3
+import com.wusy.serialportproject.devices.SCHIDERON
+import com.wusy.serialportproject.devices.ZZIO1600
 import com.wusy.serialportproject.util.CommonConfig
 import com.wusy.serialportproject.util.JDQType
-import com.wusy.serialportproject.util.SerialCMD
 import com.wusy.serialportproject.view.CirqueProgressControlView
 import com.wusy.wusylibrary.base.BaseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_envair.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.min
 
 
 class EnvAirActivity : BaseTouchActivity() {
@@ -59,14 +60,20 @@ class EnvAirActivity : BaseTouchActivity() {
         /**
          * 当前使用的继电器
          */
-        const val currentJDQType = JDQType.ZZIO1600
+        val currentJDQ:BaseDevices = ZZIO1600()
+        val currentEnv:BaseDevices = EnvQ3()
     }
 
 
     private var boradCast: EnvAirBoradCast? = null
     private val buffer = StringBuffer()
+    /**
+     * 最后发送的开关控制实体
+     */
     private var sendBean: EnvAirControlBean = EnvAirControlBean()
-
+    /**
+     * 开关适配器
+     */
     private var adapter: EnvAirAdapter? = null
     private var lastClickTime: Long = 0
     //点击事件间隔时间
@@ -75,7 +82,7 @@ class EnvAirActivity : BaseTouchActivity() {
     private val minTemp = 16
     private val maxTemp = 32
 
-    private val isCryogen=true
+    private val isCryogen=false
     private val isHeating=false
     override fun getContentViewId(): Int {
         return R.layout.activity_envair
@@ -108,7 +115,6 @@ class EnvAirActivity : BaseTouchActivity() {
         tvON.setOnClickListener {
             tvON.setTextColor(Color.parseColor("#2793FF"))
             tvOFF.setTextColor(Color.parseColor("#FFFFFF"))
-
         }
         tvOFF.setOnClickListener {
             tvON.setTextColor(Color.parseColor("#FFFFFF"))
@@ -179,7 +185,7 @@ class EnvAirActivity : BaseTouchActivity() {
             //这是一个每1min执行一次的定时器
             while (true) {
                 buffer.delete(0, buffer.length)//定时更新下数据存储器，防止出现骚问题
-                sendSerial(SerialCMD.EnvironmenttalSearch)
+                sendSerial(currentEnv.SearchStatusCode)
                 Thread.sleep(1000)
                 sendJDQSearch()
                 Thread.sleep(60 * 1000)
@@ -235,9 +241,9 @@ class EnvAirActivity : BaseTouchActivity() {
      * 发送寄电器控制命令
      */
     private fun sendJDQControl() {
-        when (currentJDQType) {
-            JDQType.SCHIDERON -> {
-                sendSerial(SerialCMD.JDQSearch)
+        when (currentJDQ.name) {
+            JDQType.SCHIDERON-> {
+                sendSerial(currentJDQ.SearchStatusCode)
             }
             JDQType.ZZIO1600 -> {
                 if (sendBean.isOpen) {//确实是打开命令
@@ -245,14 +251,14 @@ class EnvAirActivity : BaseTouchActivity() {
                         EnvAirControlBean.TYPE_Cryogen -> {//发送制冷命令
                             var heatingBean = searchControlBean(EnvAirControlBean.TYPE_Heating)
                             if (heatingBean != null && heatingBean.isOpen) {
-                                sendSerial(SerialCMD.getZZSendControlCode(heatingBean.switchIndex, false))
+                                sendSerial((currentJDQ as ZZIO1600).getSendControlCode(heatingBean.switchIndex, false))
                                 changeStatusOfView(EnvAirControlBean.TYPE_Heating, false)
                             }
                         }
                         EnvAirControlBean.TYPE_Heating -> {//发送制热命令
                             var cryogenBean = searchControlBean(EnvAirControlBean.TYPE_Cryogen)
                             if (cryogenBean != null && cryogenBean.isOpen) {
-                                sendSerial(SerialCMD.getZZSendControlCode(cryogenBean.switchIndex, false))
+                                sendSerial((currentJDQ as ZZIO1600).getSendControlCode(cryogenBean.switchIndex, false))
                                 changeStatusOfView(EnvAirControlBean.TYPE_Cryogen, false)
                             }
                         }
@@ -260,7 +266,7 @@ class EnvAirActivity : BaseTouchActivity() {
                 }
                 Thread(Runnable {
                     Thread.sleep(100)
-                    sendSerial(SerialCMD.getZZSendControlCode(sendBean.switchIndex, sendBean.isOpen))
+                    sendSerial((currentJDQ as ZZIO1600).getSendControlCode(sendBean.switchIndex, sendBean.isOpen))
                     Logger.i("发送了一条寄电器控制命令：$sendBean")
                 }).start()
             }
@@ -271,16 +277,12 @@ class EnvAirActivity : BaseTouchActivity() {
      * 查询寄电器状态
      */
     private fun sendJDQSearch() {
-        when (currentJDQType) {
-            JDQType.SCHIDERON -> {
-                sendSerial(SerialCMD.JDQSearch)
-            }
-            JDQType.ZZIO1600 -> {
-                sendSerial(SerialCMD.getZZSendSearchCode())
-            }
-        }
+        sendSerial(currentJDQ.SearchStatusCode)
     }
 
+    /**
+     * 通过串口发送命令
+     */
     private fun sendSerial(msg: String) {
         var intent = Intent()
         intent.putExtra("data", "send")
@@ -315,36 +317,25 @@ class EnvAirActivity : BaseTouchActivity() {
                     sendBroadcast(intent)
                     val enD = EnvironmentalDetector(msg.obj.toString())
                     Constants.curED = enD
-                    Logger.i(
-                        "---------经分析--------\n" +
-                                "PM2.5=" + enD.pM2_5 + "\n" +
-                                "温度=" + enD.temp + "\n" +
-                                "湿度=" + enD.humidity + "\n" +
-                                "CO2=" + enD.cO2 + "\n" +
-                                "TVOC=" + enD.tvoc + "\n" +
-                                "室外PM2.5=" + enD.pM2_5OutDoor + "\n" +
-                                "甲醛=" + enD.formaldehyde + "\n" +
-                                "-----------------------"
-                    )
                     tvTempCount.text = enD.temp.toString()
                     tvHumidityCount.text = enD.humidity.toString()
-                    autoCryogen(enD)
-                    autoHeating(enD)
+//                    autoCryogen(enD)
+//                    autoHeating(enD)
                 }
                 1 -> {
                     Logger.d("获取的SCHIDERON寄电器状态的数据" + msg.obj)
                     val data = msg.obj.toString().substring(16, 18)
                     if (sendBean != null && sendBean.isSend) {
                         //如果有控制命令，则讲获取的数据转为二进制，更改为要发送的二进制，在转成16进制发送
-                        sendSerial(SerialCMD.getSendControlCode(calcuHexOfSendControl(data)))
+                        sendSerial((currentJDQ as SCHIDERON).getSendControlCode(calcuHexOfSendControl(data)))
                         //发送完成，关闭发送事件
                         sendBean.isSend = false
                     } else {
                         //如果不需要控制，只是查询状态，则将按钮与状态对应
-                        var statusList = getStatus(data, 8)
                         adapter?.let {
+                            var praseList=(currentJDQ as SCHIDERON).parseStatusData(msg.obj.toString())
                             for (bean in it.list) {
-                                bean.isOpen = statusList[bean.switchIndex] == 1
+                                bean.isOpen = praseList[bean.switchIndex] == 1
                             }
                             it.notifyDataSetChanged()
                         }
@@ -352,21 +343,10 @@ class EnvAirActivity : BaseTouchActivity() {
                 }
                 2 -> {
                     Logger.d("获取的ZZ-IO1600寄电器状态的数据" + msg.obj)
-                    val data = msg.obj.toString().substring(6, 10)
-                    var list = getStatus(data, 16)
-                    //解析到的list含义前8位，代表的继电器9--16，后8位代表的继电器1--8
-                    //例如[0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0]代表1/2/5/12继电器点亮
-                    //这里我们从新组装数据的顺序，让1--16对应
-                    var listNew = ArrayList<Int>()
-                    for (i in 8 until 16) {
-                        listNew.add(list[i])
-                    }
-                    for (i in 0 until 8) {
-                        listNew.add(list[i])
-                    }
                     adapter?.let {
+                        var praseList=(currentJDQ as ZZIO1600).parseStatusData(msg.obj.toString())
                         for (bean in it.list) {
-                            bean.isOpen = listNew[bean.switchIndex] == 1
+                            bean.isOpen = praseList[bean.switchIndex] == 1
                         }
                         it.notifyDataSetChanged()
                     }
@@ -483,6 +463,7 @@ class EnvAirActivity : BaseTouchActivity() {
             if (intent.action == CommonConfig.SERIALPORTPROJECT_ACTION_SP_UI) {
                 val data = intent.getStringExtra("msg")
                 buffer.append(data)
+
                 if (buffer.toString().length > 4 && buffer.toString().substring(0, 4) == "0103") {//环境探测器数据
                     val message = Message.obtain()
                     message.what = 0
