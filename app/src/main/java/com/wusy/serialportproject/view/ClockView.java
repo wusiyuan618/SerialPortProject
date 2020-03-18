@@ -60,15 +60,15 @@ public class ClockView extends View {
         getViewTreeObserver().addOnPreDrawListener(onPreDrawListener);
 
         //点击显示具体时间
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                String time = String.format("当前时间：%02d:%02d:%02d",
-                        calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND));
-                Toast.makeText(context,time, Toast.LENGTH_SHORT).show();
-            }
-        });
+//        setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Calendar calendar = Calendar.getInstance();
+//                String time = String.format("当前时间：%02d:%02d:%02d",
+//                        calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE),calendar.get(Calendar.SECOND));
+//                Toast.makeText(context,time, Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         //初始化所有Paint对象
         initializePaints();

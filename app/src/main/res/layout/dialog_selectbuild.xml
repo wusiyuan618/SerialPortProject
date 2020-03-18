@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="180dp"
+            android:background="#292E33"
+            android:layout_height="400dp">
+
+
+        <com.aigestudio.wheelpicker.WheelPicker
+                android:id="@+id/thisWheel"
+                app:wheel_item_text_size="30sp"
+                app:wheel_curved="false"
+                app:wheel_indicator="true"
+                app:wheel_item_text_color="@color/wheelNormalItem"
+                app:wheel_selected_item_text_color="#FFFFFF"
+                app:wheel_visible_item_count="5"
+                app:wheel_curtain="false"
+                app:wheel_indicator_color="#ffffff"
+                app:wheel_atmospheric="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+    </LinearLayout>
+</LinearLayout>

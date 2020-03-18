@@ -41,7 +41,7 @@ class SettingActivity: BaseTouchActivity(){
             ft.add(R.id.fragmentBox,this.fragment as ScreenSettingFragment,"ScreenSettingFragment")
         })
         list.add(SettingBean().apply {
-            this.title="新风时间"
+            this.title="环境设置"
             this.isSelect=false
             this.fragment=FreshSettingFragment()
             ft.add(R.id.fragmentBox,this.fragment as FreshSettingFragment,"FreshSettingFragment")

@@ -3,10 +3,11 @@ package com.wusy.serialportproject.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import com.orhanobut.logger.Logger
 import com.wusy.serialportproject.app.Constants
-import com.wusy.serialportproject.ui.ScreenActivity
+import com.wusy.serialportproject.ui.screen.ScreenActivity
+import com.wusy.serialportproject.ui.screen.ScreenClockActivity
+import com.wusy.serialportproject.ui.screen.ScreenNumberClockActivity
 import com.wusy.wusylibrary.util.SharedPreferencesUtil
 import java.util.*
 
@@ -52,17 +53,38 @@ class ScreenService: Service(){
                     /*屏保正在显示中*/
                 }
             } else {
+//                Logger.i("静止市场未到，时间为${timeDistance}  已静止${timePeriodSecond}")
                 /*说明静止之间没有超过规定时长*/
             }
         }
     })
     private fun showScreenServer(){
-        var intent=Intent(this,ScreenActivity::class.java)
+        var intent=Intent()
+        when(SharedPreferencesUtil.getInstance(this).getData(Constants.SCREEN_SETTING_MODEL_TYPE,0)){
+            0->{
+               intent.setClass(this, ScreenActivity::class.java)
+                Logger.i("正在打开屏保--空气质量")
+            }
+            1->{
+                intent.setClass(this, ScreenClockActivity::class.java)
+                Logger.i("正在打开屏保--模拟时钟")
+            }
+            2->{
+                intent.setClass(this, ScreenNumberClockActivity::class.java)
+                Logger.i("正在打开屏保--数字时钟")
+
+            }
+            else->{
+                Logger.i("未设置屏保类型,当前state值=${SharedPreferencesUtil.getInstance(this).getData(Constants.SCREEN_SETTING_MODEL_TYPE,0)}")
+            }
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
     override fun onDestroy() {
         super.onDestroy()
+        Logger.i("ScreenService destroy")
+
     }
     override fun onBind(intent: Intent?): IBinder? {
         return null

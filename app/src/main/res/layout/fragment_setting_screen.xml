@@ -1,38 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:gravity="center"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
         <TextView
                 android:id="@+id/tvTitle"
-                android:text="屏保时间"
-                android:textSize="30sp"
-                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    <TextView
-            android:id="@+id/tvContent"
-            android:text="请设置锁屏时间"
-            android:layout_marginTop="42dp"
-            android:textSize="24sp"
-            android:textColor="#FFFFFF"
+                android:layout_height="wrap_content"
+                android:text="屏保时间"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp" />
+
+        <TextView
+                android:id="@+id/tvContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="42dp"
+                android:text="请设置锁屏时间"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+        <com.aigestudio.wheelpicker.WheelPicker
+                android:id="@+id/wheel"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginRight="20dp"
+                app:wheel_atmospheric="true"
+                app:wheel_curtain="false"
+                app:wheel_curved="true"
+                app:wheel_indicator="false"
+                app:wheel_item_text_color="#666666"
+                app:wheel_item_text_size="24sp"
+                app:wheel_selected_item_text_color="#FFFDFD"
+                app:wheel_visible_item_count="7" />
+    </LinearLayout>
+
+    <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    <com.aigestudio.wheelpicker.WheelPicker
-            android:id="@+id/wheel"
-            app:wheel_selected_item_text_color="#FFFDFD"
-            app:wheel_item_text_color="#666666"
-            app:wheel_curtain="false"
-            app:wheel_visible_item_count="7"
-            app:wheel_curved="true"
-            app:wheel_atmospheric="true"
-            app:wheel_indicator="false"
-            app:wheel_item_text_size="24sp"
-            android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
-            android:layout_height="400dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
-</LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+        <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+
+                android:src="@mipmap/ico_line_home" />
+
+        <TextView
+                android:id="@+id/tvKQZL"
+                android:layout_width="270dp"
+                android:layout_height="100dp"
+                android:gravity="center"
+                android:text="空气质量"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+        <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+
+                android:src="@mipmap/ico_line_home" />
+        <TextView
+                android:id="@+id/tvMNSZ"
+                android:layout_width="270dp"
+                android:layout_height="100dp"
+                android:gravity="center"
+                android:text="模拟时钟"
+                android:alpha="0.2"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+        <ImageView
+                android:layout_width="match_parent"
+                android:scaleType="fitXY"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ico_line_home" />
+        <TextView
+                android:id="@+id/tvSZSZ"
+                android:layout_width="270dp"
+                android:layout_height="100dp"
+                android:gravity="center"
+                android:text="数字时钟"
+                android:alpha="0.2"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+        <ImageView
+                android:layout_width="match_parent"
+                android:scaleType="fitXY"
+
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ico_line_home" />
+        <TextView
+                android:id="@+id/tvXP"
+                android:layout_width="270dp"
+                android:layout_height="100dp"
+                android:gravity="center"
+                android:alpha="0.2"
+                android:text="息屏"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+        <ImageView
+                android:layout_width="match_parent"
+                android:scaleType="fitXY"
+
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ico_line_home" />
+    </LinearLayout>
+</RelativeLayout>

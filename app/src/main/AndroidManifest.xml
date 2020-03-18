@@ -14,7 +14,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.test.CenterActivity"
+        <activity android:name=".ui.EnvAirActivity"
                   android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -32,7 +32,10 @@
         <activity android:name=".ui.test.BottomActivity"/>
         <activity android:name=".ui.SettingActivity"/>
         <activity android:name=".ui.RepairActivity"/>
-        <activity android:name=".ui.ScreenActivity"/>
+        <activity android:name=".ui.screen.ScreenClockActivity"/>
+        <activity android:name=".ui.screen.ScreenActivity"/>
+        <activity android:name=".ui.screen.ScreenNumberClockActivity"/>
+
         <service
                 android:name=".service.SerialPortService"
                 android:exported="true"

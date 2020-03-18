@@ -15,6 +15,7 @@ class AndroidApplication : BaseApplication(){
     }
     override fun onCreate() {
         super.onCreate()
+        //将日志放入本地
         Logger.addLogAdapter(MyDiskLogAdapter())
         startSerialPortService()
         startScreenService()
