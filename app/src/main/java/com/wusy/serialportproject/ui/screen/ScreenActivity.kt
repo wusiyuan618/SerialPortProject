@@ -11,6 +11,7 @@ import com.wusy.serialportproject.app.BaseTouchActivity
 import com.wusy.serialportproject.app.Constants
 import com.wusy.serialportproject.bean.EnvironmentalDetector
 import com.wusy.serialportproject.bean.OutSideTempBean
+import com.wusy.serialportproject.ui.EnvAirActivity
 import com.wusy.serialportproject.util.CommonConfig
 import com.wusy.wusylibrary.util.OkHttpUtil
 import kotlinx.android.synthetic.main.activity_screen.*
@@ -92,7 +93,7 @@ class ScreenActivity:BaseTouchActivity(){
         override fun onReceive(context: Context?, intent: Intent?) {
             when(intent?.action){
                 CommonConfig.ACTION_ENVIRONMENTALDETECOTOR_DATA->{
-                    val enD = EnvironmentalDetector(intent.getStringExtra("data"))
+                    val enD = EnvironmentalDetector(intent.getStringExtra("data"),EnvAirActivity.currentEnv)
                     initDate(enD)
                 }
             }

@@ -17,6 +17,8 @@ import android.widget.TextView;
 import com.orhanobut.logger.Logger;
 import com.wusy.serialportproject.R;
 import com.wusy.serialportproject.bean.EnvironmentalDetector;
+import com.wusy.serialportproject.devices.EnvQ3;
+import com.wusy.serialportproject.ui.EnvAirActivity;
 import com.wusy.serialportproject.util.CommonConfig;
 
 import java.util.ArrayList;
@@ -119,13 +121,13 @@ public class SerialAirActivity extends Activity {
             switch (msg.what){
                 case 0://环境检测仪获取到的数据
                     logOnTv("获取的环境检测仪的数据"+msg.obj);
-                    EnvironmentalDetector enD=new EnvironmentalDetector(msg.obj.toString());
+                    EnvironmentalDetector enD=new EnvironmentalDetector(msg.obj.toString(), new EnvQ3());
                     logOnTv("---------经分析--------\n"+
                             "PM2.5="+enD.getPM2_5()+"\n"+
                             "温度="+enD.getTemp()+"\n"+
                             "湿度="+enD.getHumidity()+"\n"+
                             "CO2="+enD.getCO2()+"\n"+
-                            "TVOC="+enD.getTVOC()+"\n"+
+                            "TVOC="+enD.getTvoc()+"\n"+
                             "室外PM2.5="+enD.getPM2_5OutDoor()+"\n"+
                             "甲醛="+enD.getFormaldehyde()+"\n"+
                             "-----------------------");

@@ -150,23 +150,23 @@ class EnvAirActivity : BaseTouchActivity() {
         rlRepair.setOnClickListener {
             navigateTo(RepairActivity::class.java)
         }
-        when (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, "0")) {
-            "0" -> {
-                ivLNOFF.setImageResource(R.mipmap.btn_close_selected)
-                isCryogen = false
-                isHeating = false
-            }
-            "1" -> {
-                ivHeat.setImageResource(R.mipmap.btn_hot_selected)
-                isCryogen = false
-                isHeating = true
-            }
-            "2" -> {
-                ivClod.setImageResource(R.mipmap.btn_cool_selected)
-                isCryogen = true
-                isHeating = false
-            }
-        }
+//        when (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0)) {
+//            0 -> {
+//                ivLNOFF.setImageResource(R.mipmap.btn_close_selected)
+//                isCryogen = false
+//                isHeating = false
+//            }
+//            1 -> {
+//                ivHeat.setImageResource(R.mipmap.btn_hot_selected)
+//                isCryogen = false
+//                isHeating = true
+//            }
+//            2 -> {
+//                ivClod.setImageResource(R.mipmap.btn_cool_selected)
+//                isCryogen = true
+//                isHeating = false
+//            }
+//        }
         isXFTime = SharedPreferencesUtil.getInstance(this).getData(
             Constants.ISOPEN_XFTIME,
             false
@@ -289,14 +289,13 @@ class EnvAirActivity : BaseTouchActivity() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             when (msg.what) {
-                0//环境检测仪获取到的数据
-                -> {
+                0, 3 -> {//环境检测仪获取到的数据
                     Logger.d("获取的环境检测仪的数据" + msg.obj)
                     //将确定是环境探测器的数据通过广播发出去,并且存储全局数据。方便屏保使用
                     var intent = Intent(CommonConfig.ACTION_ENVIRONMENTALDETECOTOR_DATA)
                     intent.putExtra("data", msg.obj.toString())
                     sendBroadcast(intent)
-                    val enD = EnvironmentalDetector(msg.obj.toString())
+                    val enD = EnvironmentalDetector(msg.obj.toString(), currentEnv)
                     Constants.curED = enD
                     tvTempCount.text = enD.temp.toString()
                     tvHumidityCount.text = enD.humidity.toString()
@@ -1020,9 +1019,20 @@ class EnvAirActivity : BaseTouchActivity() {
                         0,
                         4
                     ) == "0103"
-                ) {//环境探测器数据
+                ) {//环境探测器数据EnvQ3
                     val message = Message.obtain()
                     message.what = 0
+                    message.obj = buffer.toString()
+                    handler.sendMessage(message)
+                    buffer.delete(0, buffer.length)
+                }
+                if (buffer.toString().length > 4 && buffer.toString().substring(
+                        0,
+                        6
+                    ) == "01032e"
+                ) {//环境探测器数据Ate24V
+                    val message = Message.obtain()
+                    message.what = 3
                     message.obj = buffer.toString()
                     handler.sendMessage(message)
                     buffer.delete(0, buffer.length)
