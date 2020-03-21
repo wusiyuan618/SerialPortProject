@@ -31,7 +31,7 @@ class ScreenSettingFragment:BaseFragment(){
         }
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)//禁止息屏
 
-        when(SharedPreferencesUtil.getInstance(context).getData(Constants.SCREEN_SETTING_POSITION,0)){
+        when(SharedPreferencesUtil.getInstance(context).getData(Constants.SCREEN_SETTING_MODEL_TYPE,0)){
             0->{
                 hideAll()
                 tvKQZL.alpha=1f

@@ -57,7 +57,7 @@ class FreshSettingFragment:BaseFragment(){
             override fun onSelect(data: Any?, postion: Int) {
                 tvZLJNWD.text=data.toString()
                 SharedPreferencesUtil.getInstance(context).saveData(Constants.DEFAULT_TEMP_JN_ZL,data)
-                temSingleSelectPopForJNZL.dismiss()
+//                temSingleSelectPopForJNZL.dismiss()
             }
 
         })
@@ -75,7 +75,7 @@ class FreshSettingFragment:BaseFragment(){
                 override fun onSelect(data: Any?, postion: Int) {
                     tvZRJNWD.text=data.toString()
                     SharedPreferencesUtil.getInstance(context).saveData(Constants.DEFAULT_TEMP_JN_ZR,data)
-                    temSingleSelectPopForJNZR.dismiss()
+//                    temSingleSelectPopForJNZR.dismiss()
                 }
 
             })
@@ -103,7 +103,7 @@ class FreshSettingFragment:BaseFragment(){
                 override fun onSelect(data: Any?, postion: Int) {
                     tvZLLJWD.text=data.toString()
                     SharedPreferencesUtil.getInstance(context).saveData(Constants.DEFAULT_TEMP_OUTHOME_ZL,data)
-                    temSingleSelectPopForLJZL.dismiss()
+//                    temSingleSelectPopForLJZL.dismiss()
                 }
 
             })
@@ -121,7 +121,7 @@ class FreshSettingFragment:BaseFragment(){
                 override fun onSelect(data: Any?, postion: Int) {
                     tvZRLJWD.text=data.toString()
                     SharedPreferencesUtil.getInstance(context).saveData(Constants.DEFAULT_TEMP_OUTHOME_ZR,data)
-                    temSingleSelectPopForLJZR.dismiss()
+//                    temSingleSelectPopForLJZR.dismiss()
                 }
 
             })
@@ -149,7 +149,7 @@ class FreshSettingFragment:BaseFragment(){
                 override fun onSelect(data: Any?, postion: Int) {
                     tvTFSJ.text=data.toString()
                     SharedPreferencesUtil.getInstance(context).saveData(Constants.DEFAULT_SETTING_TFTIME,data)
-                    temSingleSelectPopForTFSJ.dismiss()
+//                    temSingleSelectPopForTFSJ.dismiss()
                 }
 
             })
@@ -190,7 +190,7 @@ class FreshSettingFragment:BaseFragment(){
     }
     fun initTemp():ArrayList<String>{
         var list=ArrayList<String>()
-        for(i in 16..30){
+        for(i in 5..35){
             list.add("${i}℃")
         }
         return list

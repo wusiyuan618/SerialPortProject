@@ -32,7 +32,7 @@ class EnvAirControlBean{
     var imgResourceSelect:Int?=null
     var imgResourceNormal:Int?=null
     override fun toString(): String {
-        return "EnvAirControlBean(isSend=$isSend, switchIndex=$switchIndex, isOpen=$isOpen, type=$type, content=$content, imgResourceSelect=$imgResourceSelect, imgResourceNormal=$imgResourceNormal)"
+        return "EnvAirControlBean(isSend=$isSend, switchIndex=$switchIndex, isOpen=$isOpen, content=$content)"
     }
 
 

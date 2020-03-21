@@ -92,7 +92,6 @@
                     android:layout_below="@id/tvAirQualityContent"
                     android:layout_marginLeft="36dp"
                     android:layout_toRightOf="@id/ivAirQuality"
-                    android:text=""
                     android:textColor="#FFFFFF"
                     android:textSize="44sp" />
 
@@ -448,7 +447,7 @@
 
                 <ImageView
                         android:id="@+id/ivLNOFF"
-                        android:src="@mipmap/btn_close_normal"
+                        android:src="@mipmap/btn_close_selected"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 

@@ -36,6 +36,7 @@ class Constants {
         const val BTN_STATE_LN="btn_state_ln"
         const val BTN_STATE_SD="btn_state_sd"
         const val BTN_STATE_XF="btn_state_xf"
+        const val BTN_STATE_SWITCH="btn_state_switch"
 
 
         /**

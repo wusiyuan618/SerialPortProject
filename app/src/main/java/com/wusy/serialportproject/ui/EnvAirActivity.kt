@@ -22,10 +22,7 @@ import com.wusy.serialportproject.app.BaseTouchActivity
 import com.wusy.serialportproject.app.Constants
 import com.wusy.serialportproject.bean.EnvironmentalDetector
 import com.wusy.serialportproject.bean.EnvAirControlBean
-import com.wusy.serialportproject.devices.BaseDevices
-import com.wusy.serialportproject.devices.EnvQ3
-import com.wusy.serialportproject.devices.SCHIDERON
-import com.wusy.serialportproject.devices.ZZIO1600
+import com.wusy.serialportproject.devices.*
 import com.wusy.serialportproject.util.CommonConfig
 import com.wusy.serialportproject.util.JDQType
 import com.wusy.serialportproject.view.CirqueProgressControlView
@@ -72,12 +69,19 @@ class EnvAirActivity : BaseTouchActivity() {
          * 新风
          */
         const val MODE_Hairdryer = 6
+        /**
+         * 风阀 关、小、中、大
+         */
+        const val MODE_Wind_Off = 7
+        const val MODE_Wind_Min = 8
+        const val MODE_Wind_Mid = 9
+        const val MODE_Wind_Max = 10
 
         /**
          * 当前使用的继电器
          */
         val currentJDQ: BaseDevices = ZZIO1600()
-        val currentEnv: BaseDevices = EnvQ3()
+        val currentEnv: BaseDevices = Ate24V()
     }
 
 
@@ -89,10 +93,10 @@ class EnvAirActivity : BaseTouchActivity() {
     private var sendBean: EnvAirControlBean = EnvAirControlBean()
     private var lastClickTime: Long = 0
     //点击事件间隔时间
-    private val times: Long = 500
+    private val times: Long = 50
     private var curTemp = 25
-    private val minTemp = 16
-    private val maxTemp = 32
+    private val minTemp = 5
+    private val maxTemp = 35
     //自动制冷
     private var isCryogen = false
     //自动制热
@@ -111,6 +115,7 @@ class EnvAirActivity : BaseTouchActivity() {
     lateinit var btnXFBean: EnvAirControlBean
     lateinit var btnOnBean: EnvAirControlBean
     lateinit var btnOffBean: EnvAirControlBean
+    lateinit var btnWindBean: EnvAirControlBean
 
     override fun getContentViewId(): Int {
         return R.layout.activity_envair
@@ -150,23 +155,7 @@ class EnvAirActivity : BaseTouchActivity() {
         rlRepair.setOnClickListener {
             navigateTo(RepairActivity::class.java)
         }
-//        when (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0)) {
-//            0 -> {
-//                ivLNOFF.setImageResource(R.mipmap.btn_close_selected)
-//                isCryogen = false
-//                isHeating = false
-//            }
-//            1 -> {
-//                ivHeat.setImageResource(R.mipmap.btn_hot_selected)
-//                isCryogen = false
-//                isHeating = true
-//            }
-//            2 -> {
-//                ivClod.setImageResource(R.mipmap.btn_cool_selected)
-//                isCryogen = true
-//                isHeating = false
-//            }
-//        }
+        restoreSwitchBtnState()
         isXFTime = SharedPreferencesUtil.getInstance(this).getData(
             Constants.ISOPEN_XFTIME,
             false
@@ -200,7 +189,7 @@ class EnvAirActivity : BaseTouchActivity() {
             }
         }).start()
         Thread(Runnable {
-            //这是一个每分钟执行一次的时间线程
+            //这是一个每秒钟执行一次的时间线程
             while (true) {
                 var calendar = Calendar.getInstance()
                 runOnUiThread {
@@ -299,9 +288,11 @@ class EnvAirActivity : BaseTouchActivity() {
                     Constants.curED = enD
                     tvTempCount.text = enD.temp.toString()
                     tvHumidityCount.text = enD.humidity.toString()
+                    tvAirQualityCount.text = enD.AQI.toString()
                     /* 开启制冷制热 */
                     startAutoCryogen(enD)
                     startAutoHeating(enD)
+                    startControlXF(enD)
                 }
                 1 -> {
                     Logger.d("获取的SCHIDERON寄电器状态的数据" + msg.obj)
@@ -348,11 +339,14 @@ class EnvAirActivity : BaseTouchActivity() {
                     if (praseList[btnJSBean.switchIndex] == 1) {//加湿中
                         ivJS.setImageResource(R.mipmap.btn_humidification_selected)
                         btnJSBean.isOpen = true
+                        recordingBtnState("sd", 2)
                     } else if (praseList[btnCSBean.switchIndex] == 1) {//除湿中
                         ivCS.setImageResource(R.mipmap.btn_dehumidification_selected)
                         btnCSBean.isOpen = true
+                        recordingBtnState("sd", 1)
                     } else {//都关闭
                         ivSDOFF.setImageResource(R.mipmap.btn_close_selected)
+                        recordingBtnState("sd", 0)
                     }
                     /**
                      * 新风开关状态检查
@@ -363,13 +357,16 @@ class EnvAirActivity : BaseTouchActivity() {
                     if (isXFTime) {
                         ivTime.setImageResource(R.mipmap.btn_ontime_selected)
                         btnXFBean.isOpen = praseList[btnXFBean.switchIndex] == 1
+                        recordingBtnState("xf", 0)
                     } else {
                         if (praseList[btnXFBean.switchIndex] == 1) {//新风开启中
                             ivXFON.setImageResource(R.mipmap.btn_open_selected)
                             btnXFBean.isOpen = true
+                            recordingBtnState("xf", 2)
                         } else {
                             ivXFOFF.setImageResource(R.mipmap.btn_close_selected)
                             btnXFBean.isOpen = false
+                            recordingBtnState("xf", 1)
                         }
                     }
                 }
@@ -425,6 +422,67 @@ class EnvAirActivity : BaseTouchActivity() {
                 }
             } else {
                 Logger.i("适宜温度，不需要操作制热命令")
+            }
+        }
+    }
+
+    private fun startControlXF(enD: EnvironmentalDetector) {
+        when (enD.cO2) {
+            in 0..500 -> {
+                if (btnWindBean.switchIndex == MODE_Wind_Off && btnWindBean.isOpen) return
+                btnWindBean.apply {
+                    this.isOpen = false
+                    this.isSend = true
+                }
+                sendJDQControl()
+                btnWindBean.apply {
+                    this.isOpen = true
+                    this.isSend = true
+                    this.switchIndex = MODE_Wind_Off
+                }
+                sendJDQControl()
+            }
+            in 501..600 -> {
+                if (btnWindBean.switchIndex == MODE_Wind_Min && btnWindBean.isOpen) return
+                btnWindBean.apply {
+                    this.isOpen = false
+                    this.isSend = true
+                }
+                sendJDQControl()
+                btnWindBean.apply {
+                    this.isOpen = true
+                    this.isSend = true
+                    this.switchIndex = MODE_Wind_Min
+                }
+                sendJDQControl()
+            }
+            in 601..800 -> {
+                if (btnWindBean.switchIndex == MODE_Wind_Mid && btnWindBean.isOpen) return
+                btnWindBean.apply {
+                    this.isOpen = false
+                    this.isSend = true
+                }
+                sendJDQControl()
+                btnWindBean.apply {
+                    this.isOpen = true
+                    this.isSend = true
+                    this.switchIndex = MODE_Wind_Mid
+                }
+                sendJDQControl()
+            }
+            else -> {
+                if (btnWindBean.switchIndex == MODE_Wind_Max && btnWindBean.isOpen) return
+                btnWindBean.apply {
+                    this.isOpen = false
+                    this.isSend = true
+                }
+                sendJDQControl()
+                btnWindBean.apply {
+                    this.isOpen = true
+                    this.isSend = true
+                    this.switchIndex = MODE_Wind_Max
+                }
+                sendJDQControl()
             }
         }
     }
@@ -609,128 +667,35 @@ class EnvAirActivity : BaseTouchActivity() {
             this.switchIndex = MODE_OFF
             this.content = "关闭"
         }
+
+
         /**
          * 开启按钮
          */
         llON.setOnClickListener {
             if (!isCanClick()) return@setOnClickListener
-            Logger.i("空调已启动")
-            btnOffBean.isOpen = false
-            btnOffBean.isSend = true
-            sendBean = btnOffBean
-            sendJDQControl()
-            btnOnBean.isSend = true
-            btnOnBean.isOpen = true
-            sendBean = btnOnBean
-            sendJDQControl()
-            restoreBtnState()
-            ivON.setImageResource(R.mipmap.btn_on_selected)
-            ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
-            ivJN.setImageResource(R.mipmap.btn_energy_normal)
-            ivOFF.setImageResource(R.mipmap.btn_off_normal)
-
+            clickON()
         }
         /**
          * 关闭按钮
          */
         llOFF.setOnClickListener {
             if (!isCanClick()) return@setOnClickListener
-            Logger.i("空调已关闭")
-            LNAllOff()
-            SDAllOff()
-            XFAllOff()
-            if (btnOnBean.isOpen) {
-                btnOnBean.isOpen = false
-                btnOnBean.isSend = true
-                sendBean = btnOnBean
-                sendJDQControl()
-                btnOffBean.isSend = true
-                btnOffBean.isOpen = true
-                sendBean = btnOffBean
-                sendJDQControl()
-            } else {
-                btnOffBean.isOpen = true
-                btnOffBean.isSend = true
-                sendBean = btnOffBean
-                sendJDQControl()
-            }
-            ivON.setImageResource(R.mipmap.btn_on_normal)
-            ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
-            ivJN.setImageResource(R.mipmap.btn_energy_normal)
-            ivOFF.setImageResource(R.mipmap.btn_off_selected)
+            clickOFF()
         }
         /**
          * 离家按钮
          */
         llLJ.setOnClickListener {
             if (!isCanClick()) return@setOnClickListener
-            if (isHeating) {
-                curTemp = (SharedPreferencesUtil.getInstance(this).getData(
-                    Constants.DEFAULT_TEMP_OUTHOME_ZR,
-                    Constants.DEFAULT_TEMPDATA_LJZR
-                ) as
-                        String).split("℃")[0].toInt()
-                tempControlView.setProgress(curTemp)
-            } else if (isCryogen) {
-                curTemp = (SharedPreferencesUtil.getInstance(this).getData(
-                    Constants.DEFAULT_TEMP_OUTHOME_ZL,
-                    Constants.DEFAULT_TEMPDATA_LJZL
-                ) as String).split("℃")[0].toInt()
-                tempControlView.setProgress(curTemp)
-            } else {
-                showToast("请先选择冷暖模式")
-                return@setOnClickListener
-            }
-            Logger.i("离家模式启动")
-
-            btnOffBean.isOpen = false
-            btnOffBean.isSend = true
-            sendBean = btnOffBean
-            sendJDQControl()
-            btnOnBean.isSend = true
-            btnOnBean.isOpen = true
-            sendBean = btnOnBean
-            sendJDQControl()
-
-            ivON.setImageResource(R.mipmap.btn_on_normal)
-            ivLJ.setImageResource(R.mipmap.btn_outhome_selected)
-            ivJN.setImageResource(R.mipmap.btn_energy_normal)
-            ivOFF.setImageResource(R.mipmap.btn_off_normal)
+            clickLJ(false)
         }
         /**
          * 节能按钮
          */
         llJN.setOnClickListener {
             if (!isCanClick()) return@setOnClickListener
-            if (isHeating) {
-                curTemp = (SharedPreferencesUtil.getInstance(this).getData(
-                    Constants.DEFAULT_TEMP_JN_ZR,
-                    Constants.DEFAULT_TEMPDATA_JNZR
-                ) as String).split("℃")[0].toInt()
-                tempControlView.setProgress(curTemp)
-            } else if (isCryogen) {
-                curTemp = (SharedPreferencesUtil.getInstance(this).getData(
-                    Constants.DEFAULT_TEMP_JN_ZL,
-                    Constants.DEFAULT_TEMPDATA_JNZL
-                ) as String).split("℃")[0].toInt()
-                tempControlView.setProgress(curTemp)
-            } else {
-                showToast("请先选择冷暖模式")
-                return@setOnClickListener
-            }
-            Logger.i("节能模式启动")
-            btnOffBean.isOpen = false
-            btnOffBean.isSend = true
-            sendBean = btnOffBean
-            sendJDQControl()
-            btnOnBean.isSend = true
-            btnOnBean.isOpen = true
-            sendBean = btnOnBean
-            sendJDQControl()
-            ivON.setImageResource(R.mipmap.btn_on_normal)
-            ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
-            ivJN.setImageResource(R.mipmap.btn_energy_selected)
-            ivOFF.setImageResource(R.mipmap.btn_off_normal)
+            clickJN(false)
         }
         /**
          * 新风
@@ -742,12 +707,26 @@ class EnvAirActivity : BaseTouchActivity() {
             this.content = "新风"
         }
         /**
+         * 风力
+         */
+        btnWindBean = EnvAirControlBean().apply {
+            this.isOpen = false
+            this.isSend = false
+            this.switchIndex = MODE_Wind_Off
+            this.content = "风力"
+        }
+        /**
          * 新风开启按钮
          */
         llXFON.setOnClickListener {
             if (!isCanClickByOpen()) return@setOnClickListener
             if (!isCanClick()) return@setOnClickListener
-            recordingBtnState("xf", 2)
+            if (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0) != 0 ||
+                SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SD, 0) != 0
+            ) {
+                showToast("冷暖与湿度调节都关闭时，才可以使用")
+                return@setOnClickListener
+            }
             XFON()
         }
         /**
@@ -755,7 +734,12 @@ class EnvAirActivity : BaseTouchActivity() {
          */
         llXFOFF.setOnClickListener {
             Logger.i("正在关闭新风功能")
-            recordingBtnState("xf", 1)
+            if (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0) != 0 ||
+                SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SD, 0) != 0
+            ) {
+                showToast("冷暖与湿度调节都关闭时，才可以使用")
+                return@setOnClickListener
+            }
             XFAllOff()
         }
         /**
@@ -764,13 +748,141 @@ class EnvAirActivity : BaseTouchActivity() {
         llTime.setOnClickListener {
             if (!isCanClickByOpen()) return@setOnClickListener
             if (!isCanClick()) return@setOnClickListener
-            recordingBtnState("xf", 0)
+            if (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0) != 0 ||
+                SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SD, 0) != 0
+            ) {
+                showToast("冷暖与湿度调节都关闭时，才可以使用")
+                return@setOnClickListener
+            }
             XFTime()
         }
     }
 
+    private fun clickON() {
+        Logger.i("空调已启动")
+        ivON.setImageResource(R.mipmap.btn_on_selected)
+        ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
+        ivJN.setImageResource(R.mipmap.btn_energy_normal)
+        ivOFF.setImageResource(R.mipmap.btn_off_normal)
+        btnOffBean.isOpen = false
+        btnOffBean.isSend = true
+        sendBean = btnOffBean
+        sendJDQControl()
+        btnOnBean.isSend = true
+        btnOnBean.isOpen = true
+        sendBean = btnOnBean
+        sendJDQControl()
+        recordingBtnState("switch", 3)
+        restoreBtnState()
+    }
+
+    private fun clickOFF() {
+        Logger.i("空调已关闭")
+        ivON.setImageResource(R.mipmap.btn_on_normal)
+        ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
+        ivJN.setImageResource(R.mipmap.btn_energy_normal)
+        ivOFF.setImageResource(R.mipmap.btn_off_selected)
+        XFAllOff()
+        LNAllOff()
+        SDAllOff()
+        if (btnOnBean.isOpen) {
+            btnOnBean.isOpen = false
+            btnOnBean.isSend = true
+            sendBean = btnOnBean
+            sendJDQControl()
+            btnOffBean.isSend = true
+            btnOffBean.isOpen = true
+            sendBean = btnOffBean
+            sendJDQControl()
+        } else {
+            btnOffBean.isOpen = true
+            btnOffBean.isSend = true
+            sendBean = btnOffBean
+            sendJDQControl()
+        }
+        recordingBtnState("switch", 0)
+
+    }
+
+    private fun clickLJ(isInit: Boolean) {
+        if (isInit) {
+            restoreBtnState()
+        }
+        if (isHeating) {
+            curTemp = (SharedPreferencesUtil.getInstance(this).getData(
+                Constants.DEFAULT_TEMP_OUTHOME_ZR,
+                Constants.DEFAULT_TEMPDATA_LJZR
+            ) as
+                    String).split("℃")[0].toInt()
+            tempControlView.setProgress(curTemp)
+        } else if (isCryogen) {
+            curTemp = (SharedPreferencesUtil.getInstance(this).getData(
+                Constants.DEFAULT_TEMP_OUTHOME_ZL,
+                Constants.DEFAULT_TEMPDATA_LJZL
+            ) as String).split("℃")[0].toInt()
+            tempControlView.setProgress(curTemp)
+        } else {
+            showToast("请先选择冷暖模式")
+            return
+        }
+        Logger.i("离家模式启动")
+        ivON.setImageResource(R.mipmap.btn_on_normal)
+        ivLJ.setImageResource(R.mipmap.btn_outhome_selected)
+        ivJN.setImageResource(R.mipmap.btn_energy_normal)
+        ivOFF.setImageResource(R.mipmap.btn_off_normal)
+        btnOffBean.isOpen = false
+        btnOffBean.isSend = true
+        sendBean = btnOffBean
+        sendJDQControl()
+        btnOnBean.isSend = true
+        btnOnBean.isOpen = true
+        sendBean = btnOnBean
+        sendJDQControl()
+        recordingBtnState("switch", 2)
+
+    }
+
+    private fun clickJN(isInit: Boolean) {
+        if (isInit) {
+            restoreBtnState()
+        }
+        if (isHeating) {
+            curTemp = (SharedPreferencesUtil.getInstance(this).getData(
+                Constants.DEFAULT_TEMP_JN_ZR,
+                Constants.DEFAULT_TEMPDATA_JNZR
+            ) as String).split("℃")[0].toInt()
+            tempControlView.setProgress(curTemp)
+        } else if (isCryogen) {
+            curTemp = (SharedPreferencesUtil.getInstance(this).getData(
+                Constants.DEFAULT_TEMP_JN_ZL,
+                Constants.DEFAULT_TEMPDATA_JNZL
+            ) as String).split("℃")[0].toInt()
+            tempControlView.setProgress(curTemp)
+        } else {
+            showToast("请先选择冷暖模式")
+            return
+        }
+        ivON.setImageResource(R.mipmap.btn_on_normal)
+        ivLJ.setImageResource(R.mipmap.btn_outhome_normal)
+        ivJN.setImageResource(R.mipmap.btn_energy_selected)
+        ivOFF.setImageResource(R.mipmap.btn_off_normal)
+        Logger.i("节能模式启动")
+        btnOffBean.isOpen = false
+        btnOffBean.isSend = true
+        sendBean = btnOffBean
+        sendJDQControl()
+        btnOnBean.isSend = true
+        btnOnBean.isOpen = true
+        sendBean = btnOnBean
+        sendJDQControl()
+        recordingBtnState("switch", 1)
+    }
+
     private fun ZR() {
         Logger.i("正在打开制热功能")
+        ivClod.setImageResource(R.mipmap.btn_cool_normal)
+        ivHeat.setImageResource(R.mipmap.btn_hot_selected)
+        ivLNOFF.setImageResource(R.mipmap.btn_close_normal)
         isHeating = true
         isCryogen = false
         btnClodBean.isOpen = false
@@ -781,13 +893,14 @@ class EnvAirActivity : BaseTouchActivity() {
         btnHeatBean.isSend = true
         sendBean = btnHeatBean
         sendJDQControl()
-        ivClod.setImageResource(R.mipmap.btn_cool_normal)
-        ivHeat.setImageResource(R.mipmap.btn_hot_selected)
-        ivLNOFF.setImageResource(R.mipmap.btn_close_normal)
+        XFON()
     }
 
     private fun ZL() {
         Logger.i("正在打开制冷功能")
+        ivClod.setImageResource(R.mipmap.btn_cool_selected)
+        ivHeat.setImageResource(R.mipmap.btn_hot_normal)
+        ivLNOFF.setImageResource(R.mipmap.btn_close_normal)
         isHeating = false
         isCryogen = true
         btnHeatBean.isOpen = false
@@ -798,13 +911,14 @@ class EnvAirActivity : BaseTouchActivity() {
         btnClodBean.isOpen = true
         sendBean = btnClodBean
         sendJDQControl()
-        ivClod.setImageResource(R.mipmap.btn_cool_selected)
-        ivHeat.setImageResource(R.mipmap.btn_hot_normal)
-        ivLNOFF.setImageResource(R.mipmap.btn_close_normal)
+        XFON()
     }
 
     private fun JS() {
         Logger.i("正在打开加湿功能")
+        ivJS.setImageResource(R.mipmap.btn_humidification_selected)
+        ivCS.setImageResource(R.mipmap.btn_dehumidification_normal)
+        ivSDOFF.setImageResource(R.mipmap.btn_close_normal)
         btnCSBean.isOpen = false
         btnCSBean.isSend = true
         sendBean = btnCSBean
@@ -813,13 +927,14 @@ class EnvAirActivity : BaseTouchActivity() {
         btnJSBean.isSend = true
         sendBean = btnJSBean
         sendJDQControl()
-        ivJS.setImageResource(R.mipmap.btn_humidification_selected)
-        ivCS.setImageResource(R.mipmap.btn_dehumidification_normal)
-        ivSDOFF.setImageResource(R.mipmap.btn_close_normal)
+        XFON()
     }
 
     private fun CS() {
         Logger.i("正在打开除湿功能")
+        ivJS.setImageResource(R.mipmap.btn_humidification_normal)
+        ivCS.setImageResource(R.mipmap.btn_dehumidification_selected)
+        ivSDOFF.setImageResource(R.mipmap.btn_close_normal)
         btnJSBean.isOpen = false
         btnJSBean.isSend = true
         sendBean = btnJSBean
@@ -828,38 +943,43 @@ class EnvAirActivity : BaseTouchActivity() {
         btnCSBean.isOpen = true
         sendBean = btnCSBean
         sendJDQControl()
-        ivJS.setImageResource(R.mipmap.btn_humidification_normal)
-        ivCS.setImageResource(R.mipmap.btn_dehumidification_selected)
-        ivSDOFF.setImageResource(R.mipmap.btn_close_normal)
+        XFON()
     }
 
     private fun XFON() {
         Logger.i("正在打开新风功能")
+        recordingBtnState("xf", 2)
+        ivXFOFF.setImageResource(R.mipmap.btn_close_normal)
+        ivXFON.setImageResource(R.mipmap.btn_open_selected)
+        ivTime.setImageResource(R.mipmap.btn_ontime_normal)
         isXFTime = false
         btnXFBean.isOpen = true
         btnXFBean.isSend = true
         sendBean = btnXFBean
         sendJDQControl()
-        ivXFOFF.setImageResource(R.mipmap.btn_close_normal)
-        ivXFON.setImageResource(R.mipmap.btn_open_selected)
-        ivTime.setImageResource(R.mipmap.btn_ontime_normal)
         SharedPreferencesUtil.getInstance(this).saveData(Constants.ISOPEN_XFTIME, false)
     }
 
     private fun XFTime() {
         Logger.i("正在打开新风定时功能")
-        isXFTime = true
-        SharedPreferencesUtil.getInstance(this).saveData(Constants.ISOPEN_XFTIME, true)
-        controlXFTime(true)
+        recordingBtnState("xf", 0)
         ivXFOFF.setImageResource(R.mipmap.btn_close_normal)
         ivXFON.setImageResource(R.mipmap.btn_open_normal)
         ivTime.setImageResource(R.mipmap.btn_ontime_selected)
+        isXFTime = true
+        SharedPreferencesUtil.getInstance(this).saveData(Constants.ISOPEN_XFTIME, true)
+        controlXFTime(true)
     }
 
     /**
      * 冷暖全关方法
      */
     private fun LNAllOff() {
+        runOnUiThread {
+            ivClod.setImageResource(R.mipmap.btn_cool_normal)
+            ivHeat.setImageResource(R.mipmap.btn_hot_normal)
+            ivLNOFF.setImageResource(R.mipmap.btn_close_selected)
+        }
         isHeating = false
         isCryogen = false
         if (btnHeatBean.isOpen) {
@@ -874,10 +994,10 @@ class EnvAirActivity : BaseTouchActivity() {
             sendBean = btnClodBean
             sendJDQControl()
         }
-        runOnUiThread {
-            ivClod.setImageResource(R.mipmap.btn_cool_normal)
-            ivHeat.setImageResource(R.mipmap.btn_hot_normal)
-            ivLNOFF.setImageResource(R.mipmap.btn_close_selected)
+        if (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0) == 0 &&
+            SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SD, 0) == 0
+        ) {
+            XFAllOff()
         }
     }
 
@@ -885,6 +1005,11 @@ class EnvAirActivity : BaseTouchActivity() {
      * 湿度全关方法
      */
     private fun SDAllOff() {
+        runOnUiThread {
+            ivJS.setImageResource(R.mipmap.btn_humidification_normal)
+            ivCS.setImageResource(R.mipmap.btn_dehumidification_normal)
+            ivSDOFF.setImageResource(R.mipmap.btn_close_selected)
+        }
         if (btnJSBean.isOpen) {
             btnJSBean.isOpen = false
             btnJSBean.isSend = true
@@ -897,28 +1022,28 @@ class EnvAirActivity : BaseTouchActivity() {
             sendBean = btnCSBean
             sendJDQControl()
         }
-        runOnUiThread {
-            ivJS.setImageResource(R.mipmap.btn_humidification_normal)
-            ivCS.setImageResource(R.mipmap.btn_dehumidification_normal)
-            ivSDOFF.setImageResource(R.mipmap.btn_close_selected)
+        if (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_LN, 0) == 0 &&
+            SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SD, 0) == 0
+        ) {
+            XFAllOff()
         }
-
     }
 
     /**
      * 新风全关方法
      */
     private fun XFAllOff() {
-        isXFTime = false
-        btnXFBean.isOpen = false
-        btnXFBean.isSend = true
-        sendBean = btnXFBean
-        sendJDQControl()
+        recordingBtnState("xf", 1)
         runOnUiThread {
             ivXFOFF.setImageResource(R.mipmap.btn_close_selected)
             ivXFON.setImageResource(R.mipmap.btn_open_normal)
             ivTime.setImageResource(R.mipmap.btn_ontime_normal)
         }
+        isXFTime = false
+        btnXFBean.isOpen = false
+        btnXFBean.isSend = true
+        sendBean = btnXFBean
+        sendJDQControl()
         SharedPreferencesUtil.getInstance(this).saveData(Constants.ISOPEN_XFTIME, false)
     }
 
@@ -969,6 +1094,9 @@ class EnvAirActivity : BaseTouchActivity() {
             "xf" -> {
                 SharedPreferencesUtil.getInstance(this).saveData(Constants.BTN_STATE_XF, state)
             }
+            "switch" -> {
+                SharedPreferencesUtil.getInstance(this).saveData(Constants.BTN_STATE_SWITCH, state)
+            }
         }
     }
 
@@ -1004,6 +1132,23 @@ class EnvAirActivity : BaseTouchActivity() {
             }
             2 -> {//开启新风
                 XFON()
+            }
+        }
+    }
+
+    private fun restoreSwitchBtnState() {
+        when (SharedPreferencesUtil.getInstance(this).getData(Constants.BTN_STATE_SWITCH, 0)) {
+            0 -> {//关闭
+                clickOFF()
+            }
+            1 -> {//节能
+                clickJN(true)
+            }
+            2 -> {//离家
+                clickLJ(true)
+            }
+            3 -> {//开启
+                clickON()
             }
         }
     }

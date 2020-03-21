@@ -201,44 +201,6 @@
                             android:textSize="24sp" />
                 </RelativeLayout>
 
-
-                <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
-
-                    <TextView
-                            android:id="@+id/tvHCHO"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_weight="1"
-                            android:text="甲醛"
-                            android:textColor="#FFFFFF"
-                            android:textSize="24sp" />
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_toRightOf="@id/tvHCHO"
-                            android:layout_weight="1"
-                            android:text="(HCHO)"
-                            android:textColor="#666666"
-                            android:textSize="24sp" />
-
-                    <TextView
-                            android:id="@+id/tvHCHOCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:text=" μg/m³"
-                            android:textColor="#FFFFFF"
-                            android:textSize="24sp" />
-                </RelativeLayout>
-
                 <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
@@ -458,7 +420,7 @@
                             android:layout_centerVertical="true"
                             android:layout_toRightOf="@id/tvOutSidePower"
                             android:layout_weight="1"
-                            android:text="(PM2.5)"
+                            android:text="(power)"
                             android:textColor="#666666"
                             android:textSize="24sp" />
 
@@ -496,7 +458,7 @@
                             android:layout_centerVertical="true"
                             android:layout_toRightOf="@id/tvOutSideInfo"
                             android:layout_weight="1"
-                            android:text="(HCHO)"
+                            android:text="(info)"
                             android:textColor="#666666"
                             android:textSize="24sp" />
 
